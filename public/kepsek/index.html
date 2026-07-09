@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kepala Sekolah - Portal Sekolah</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        /* CSS Khusus Layout Sidebar & Header */
+        body {
+            background-color: #f4f6f9;
+            overflow-x: hidden;
+        }
+        .wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #198754 0%, #146c43 100%);
+            color: white;
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1040; /* Berada di atas elemen lain */
+            top: 0;
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        .sidebar-menu {
+            padding: 15px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .nav-link-custom:hover, .nav-link-custom.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--kuning-utama);
+        }
+        .nav-link-custom i {
+            width: 30px;
+            font-size: 1.1rem;
+        }
+        
+        /* Main Panel Styling */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+        
+        /* Top Header Styling */
+        .top-header {
+            background-color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1020;
+            position: sticky;
+            top: 0;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--hijau-utama);
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Overlay Gelap untuk Layar Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1030;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVE RULES)
+           ========================================= */
+        
+        /* Desktop & Tablet Besar (Layar > 768px) */
+        @media (min-width: 768px) {
+            .main-panel {
+                width: calc(100% - 260px);
+                margin-left: 260px;
+            }
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
+        /* Layar Mobile (Layar < 768px) */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                transform: translateX(-100%); /* Sembunyikan sidebar ke kiri */
+            }
+            /* Class yang ditambahkan via JS saat tombol ditekan */
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-panel {
+                width: 100%;
+                margin-left: 0;
+            }
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg" id="sidebarMenu">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-school fa-3x mb-2 text-warning"></i>
+                <h5 class="fw-bold mb-0">Panel Kepsek</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="#" class="nav-link-custom active">
+                    <i class="fa-solid fa-house"></i> <span>Dashboard Utama</span>
+                </a>
+                <a href="guru.html" class="nav-link-custom">
+                    <i class="fa-solid fa-users-viewfinder"></i> <span>Monitoring Guru</span>
+                </a>                
+            </div>
+            <div class="p-3">
+                <p class="text-center small opacity-50 mb-0">Portal PAI & Budi Pekerti<br>Kota Banjar</p>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            
+            <header class="top-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light d-md-none shadow-sm" id="sidebarToggleBtn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h5 class="mb-0 fw-bold text-dark d-none d-sm-block">Sistem Informasi Manajemen</h5>
+                </div>
+                
+                <div class="user-profile dropdown">
+                    <div class="text-end d-none d-sm-block">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaKepsek">Memuat...</div>
+                        <small class="text-muted" id="nipKepsek">NIP: -</small>
+                    </div>
+                    
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarKepsek" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Akun</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h3 class="fw-bold">Dashboard Executive</h3>
+                        <p class="text-muted text-break">Ringkasan aktivitas guru dan administrasi sekolah.</p>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4">
+                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-success h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Total Guru PAI</h6>
+                                    <h2 class="fw-bold mb-0">12</h2>
+                                </div>
+                                <i class="fa-solid fa-users fa-3x text-success opacity-25"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-warning h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Dokumen Cetak</h6>
+                                    <h2 class="fw-bold mb-0">145</h2>
+                                </div>
+                                <i class="fa-solid fa-file-signature fa-3x text-warning opacity-25"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-primary h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Input Hari Ini</h6>
+                                    <h2 class="fw-bold mb-0">85%</h2>
+                                </div>
+                                <i class="fa-solid fa-chart-line fa-3x text-primary opacity-25"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card kartu-kustom border-0 p-4 min-vh-50">
+                    <h5 class="fw-bold mb-4">Aktivitas Terkini</h5>
+                    <p class="text-muted">Data grafik dan tabel monitoring guru akan ditampilkan di sini.</p>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 1. Logika Toggling Sidebar untuk Mobile
+        const sidebar = document.getElementById('sidebarMenu');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+
+        // Fungsi buka/tutup sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        // Jalankan fungsi ketika tombol hamburger ditekan
+        toggleBtn.addEventListener('click', toggleSidebar);
+
+        // Tutup sidebar otomatis ketika area gelap (overlay) ditekan
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+
+
+        // 2. Logika Sesi & Otentikasi
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                const userData = JSON.parse(sesi);
+                
+                if (userData.Role !== "Kepala Sekolah") {
+                    alert("Akses Ditolak! Anda bukan Kepala Sekolah.");
+                    window.location.href = "/";
+                    return;
+                }
+
+                document.getElementById('namaKepsek').innerText = userData.Nama_Lengkap;
+                document.getElementById('nipKepsek').innerText = "NIP: " + (userData.username || "-");
+                
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=ffc107&color=000&bold=true`;
+                document.getElementById('avatarKepsek').src = avatarUrl;
+            }
+        });
+
+        // 3. Logika Keluar Aplikasi
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>

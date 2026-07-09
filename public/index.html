@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal Administrasi PAI</title>
+    
+    <meta property="og:title" content="Administrasi Guru PAI & Budi Pekerti">
+    <meta property="og:description" content="Sistem Informasi Manajemen Sekolah Terpadu Kota Banjar.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=Portal+PAI+Banjar">
+    <meta property="og:url" content="https://domain-sekolah-anda.com/">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            /* Background Gradient Hijau ke Kuning untuk seluruh layar */
+            background: linear-gradient(135deg, #198754 0%, #ffc107 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .login-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .logo-app {
+            max-width: 200px;
+        }
+        .ikon-mata { cursor: pointer; color: #6c757d; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            
+            <div class="col-lg-6 text-white text-center text-lg-start mb-5 mb-lg-0">
+                <img src="logo.png" alt="Logo" class="logo-app">
+                <h1 class="display-4 fw-bold mb-3">Administrasi Guru<br>PAI & Budi Pekerti</h1>
+                <h4 class="fw-normal opacity-75">Kota Banjar - Tahun Ajaran 2026/2027</h4>
+            </div>
+
+            <div class="col-lg-5 col-xl-4">
+                <div class="card login-card p-4 p-sm-5">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-tema-hijau">Masuk Aplikasi</h3>
+                    </div>
+                    
+                    <form id="formLogin">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
+                                <input type="text" class="form-control" id="username" placeholder="Username..." required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
+                                <input type="password" class="form-control" id="password" placeholder="Password..." required>
+                                <span class="input-group-text bg-white ikon-mata" id="togglePassword">
+                                    <i class="fa-regular fa-eye" id="ikonMata"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-tema-kuning w-100 py-2 shadow-sm rounded-3 fw-bold" onclick="prosesLogin()">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>Masuk Sekarang
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Fitur Toggle Password
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const ikonMata = document.getElementById('ikonMata');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            ikonMata.classList.toggle('fa-eye');
+            ikonMata.classList.toggle('fa-eye-slash');
+        });
+
+        // Fungsi Login
+        async function prosesLogin() {
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+            const btnLogin = document.querySelector('button[onclick="prosesLogin()"]');
+
+            if (!usernameInput || !passwordInput) {
+                Swal.fire({ icon: 'warning', title: 'Oops!', text: 'Username dan Password wajib diisi.', confirmButtonColor: '#198754' });
+                return;
+            }
+
+            btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Memeriksa...';
+            btnLogin.disabled = true;
+
+            try {
+                const response = await fetch('/.netlify/functions/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput, device: navigator.userAgent })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    localStorage.setItem('user_session', JSON.stringify(result.user));
+                    const role = result.user.Role;
+                    window.location.href = role === "Guru" ? "/guru/" : role === "Kepala Sekolah" ? "/kepsek/" : "/pengawas/";
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: result.message, confirmButtonColor: '#198754' });
+                    resetTombol(btnLogin, '<i class="fa-solid fa-right-to-bracket me-2"></i>Masuk Sekarang');
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gangguan Server', text: 'Periksa koneksi Anda.', confirmButtonColor: '#198754' });
+                resetTombol(btnLogin, '<i class="fa-solid fa-right-to-bracket me-2"></i>Masuk Sekarang');
+            }
+        }
+
+        function resetTombol(tombol, teksAsli) {
+            tombol.innerHTML = teksAsli;
+            tombol.disabled = false;
+        }
+    </script>
+</body>
+</html>

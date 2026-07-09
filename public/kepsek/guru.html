@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Guru - Portal Sekolah</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid var(--kuning-utama); }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { display: flex; flex-direction: column; min-height: 100vh; width: 100%; transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--hijau-utama); }
+        .content-area { padding: 20px; flex-grow: 1; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 1030; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        
+        @media (min-width: 768px) {
+            .main-panel { width: calc(100% - 260px); margin-left: 260px; }
+            .sidebar { transform: translateX(0) !important; }
+            .sidebar-overlay { display: none !important; }
+        }
+        @media (max-width: 767.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-panel { width: 100%; margin-left: 0; }
+            .sidebar-overlay.show { display: block; opacity: 1; }
+        }
+        
+        /* Style Tambahan untuk Tabel */
+        .table-responsive { border-radius: 10px; overflow: hidden; }
+        .table-custom thead th { background-color: var(--hijau-utama); color: white; border: none; padding: 15px; font-weight: 600; }
+        .table-custom tbody td { padding: 15px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg" id="sidebarMenu">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-school fa-3x mb-2 text-warning"></i>
+                <h5 class="fw-bold mb-0">Panel Kepsek</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/kepsek/" class="nav-link-custom">
+                    <i class="fa-solid fa-house"></i> <span>Dashboard Utama</span>
+                </a>
+                <a href="/kepsek/guru.html" class="nav-link-custom active">
+                    <i class="fa-solid fa-users-viewfinder"></i> <span>Monitoring Guru</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            <header class="top-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light d-md-none shadow-sm" id="sidebarToggleBtn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h5 class="mb-0 fw-bold text-dark d-none d-sm-block">Sistem Informasi Manajemen</h5>
+                </div>
+                
+                <div class="user-profile dropdown">
+                    <div class="text-end d-none d-sm-block">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaKepsek">Memuat...</div>
+                        <small class="text-muted" id="nipKepsek">NIP: -</small>
+                    </div>
+                    
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarKepsek" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Akun</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="card kartu-kustom border-0 p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-chalkboard-user text-tema-hijau me-2"></i>Daftar Guru PAI</h5>
+                        <button class="btn btn-outline-success btn-sm" onclick="loadDataGuru()"><i class="fa-solid fa-rotate me-1"></i>Refresh</button>
+                    </div>
+
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>NIP</th>
+                                    <th>Status</th>
+                                    <th>Nama Sekolah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelGuru">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i><br>Memuat data guru...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+    <script>
+        // Logika Sidebar Mobile
+        const sidebar = document.getElementById('sidebarMenu'), overlay = document.getElementById('sidebarOverlay'), toggleBtn = document.getElementById('sidebarToggleBtn');
+        toggleBtn.addEventListener('click', () => { sidebar.classList.toggle('show'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); });
+
+        // Variabel Sesi
+        let nipKepalaSekolah = "";
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                const userData = JSON.parse(sesi);
+                if (userData.Role !== "Kepala Sekolah") { window.location.href = "/"; return; }
+                
+                if (userData.Role !== "Kepala Sekolah") {
+                    alert("Akses Ditolak! Anda bukan Kepala Sekolah.");
+                    window.location.href = "/";
+                    return;
+                }
+
+                document.getElementById('namaKepsek').innerText = userData.Nama_Lengkap;
+                document.getElementById('nipKepsek').innerText = "NIP: " + (userData.username || "-");
+                
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=ffc107&color=000&bold=true`;
+                document.getElementById('avatarKepsek').src = avatarUrl;
+				
+                // Ambil NIP Kepala Sekolah untuk dikirim ke Backend
+                // nipKepalaSekolah = userData.NIP_Kepala_Sekolah;
+				
+				nipKepalaSekolah = userData.Username; 
+
+				// Tambahkan console.log untuk melihat apa yang sebenarnya dikirim
+				console.log("Mencari Guru dengan NIP Kepsek:", nipKepalaSekolah);
+                
+                // Panggil fungsi fetch data guru
+                loadDataGuru();
+            }
+        });
+
+        // Fungsi fetch data dari Netlify Functions
+        async function loadDataGuru() {
+            const tbody = document.getElementById('tabelGuru');
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i><br>Mengambil data dari server...</td></tr>`;
+
+            try {
+                const response = await fetch('/.netlify/functions/get-guru', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nip_kepsek: nipKepalaSekolah })
+                });
+                
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTabel(result.data);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">Gagal memuat data.</td></tr>`;
+                }
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">Terjadi kesalahan jaringan.</td></tr>`;
+            }
+        }
+
+        // Fungsi untuk merender JSON ke dalam baris HTML
+        function renderTabel(dataGuru) {
+            const tbody = document.getElementById('tabelGuru');
+            tbody.innerHTML = "";
+
+            if (dataGuru.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Belum ada data guru yang berafiliasi dengan Anda.</td></tr>`;
+                return;
+            }
+
+            dataGuru.forEach((guru, index) => {
+                // Menentukan Badge Status
+                const isActive = (guru.Aktif == 1 || guru.Aktif == "Ya" || guru.Aktif == true);
+                const badgeStatus = isActive ? `<span class="badge bg-success">Aktif</span>` : `<span class="badge bg-danger">Nonaktif</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${index + 1}</td>
+                    <td>${guru.Nama_Lengkap}</td>
+                    <td>${guru.Username}</td>
+                    <td>${badgeStatus}</td>
+                    <td>${guru["Nama Sekolah"] || "-"}</td>
+                    <td>
+                        <a href="/kepsek/dokumen.html?nip=${guru.Username}&nama=${encodeURIComponent(guru.Nama_Lengkap)}" 
+						   class="btn btn-sm btn-outline-primary" title="Lihat Laporan Dokumen">
+						   <i class="fa-solid fa-file-pdf me-1"></i> Buka
+						</a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+		
+		// 3. Logika Keluar Aplikasi
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>

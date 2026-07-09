@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Dokumen Guru - Portal Sekolah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        body { background-color: #f4f6f9; }
+        .kartu-kustom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .table-custom thead th { background-color: var(--hijau-utama); color: white; border: none; padding: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-4 mb-5">
+        <a href="/kepsek/guru.html" class="btn btn-outline-secondary mb-3">
+            <i class="fa-solid fa-arrow-left me-2"></i>Kembali ke Daftar Guru
+        </a>
+
+        <div class="card kartu-kustom p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="fa-solid fa-folder-open text-tema-hijau me-2"></i>Log Cetak Dokumen</h5>
+                    <p class="text-muted mb-0" id="namaGuruTeks">Memuat data guru...</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-custom">
+                    <thead>
+                        <tr>
+                            <th>Waktu Pembuatan</th>
+                            <th>Dokumen</th>
+                            <th>Kelas</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelDokumen">
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i><br>Menarik data dari Google Sheets...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Ekstrak Data dari URL Parameter (?nip=...&nama=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const nipGuru = urlParams.get('nip');
+        const namaGuru = urlParams.get('nama');
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Validasi Sesi Kepala Sekolah (Keamanan)
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi || JSON.parse(sesi).Role !== "Kepala Sekolah") {
+                window.location.href = "/"; return;
+            }
+
+            // Validasi URL (Jika tiba-tiba diakses tanpa parameter NIP)
+            if(!nipGuru) {
+                alert("Parameter NIP tidak ditemukan. Mengembalikan ke halaman guru.");
+                window.location.href = "/kepsek/guru.html"; return;
+            }
+
+            document.getElementById('namaGuruTeks').innerHTML = `Dokumen atas nama: <strong>${namaGuru || nipGuru}</strong>`;
+            
+            // Panggil fungsi penarikan data
+            fetchDokumen();
+        });
+
+        async function fetchDokumen() {
+            const tbody = document.getElementById('tabelDokumen');
+            
+            try {
+                const response = await fetch('/.netlify/functions/get-dokumen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nip: nipGuru })
+                });
+                
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTabelDokumen(result.data);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Terjadi kesalahan koneksi server.</td></tr>`;
+            }
+        }
+
+        function renderTabelDokumen(dataDokumen) {
+            const tbody = document.getElementById('tabelDokumen');
+            tbody.innerHTML = "";
+
+            if (dataDokumen.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Guru ini belum pernah membuat dokumen apapun.</td></tr>`;
+                return;
+            }
+
+            dataDokumen.forEach(doc => {
+                // Konversi tanggal/waktu dari Sheets yang panjang menjadi lebih rapi
+                const waktuMentah = new Date(doc["Waktu"]);
+                const waktuFormat = waktuMentah.toLocaleDateString('id-ID', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+
+                const linkDokumen = doc["Link Dokumen"] || "#";
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="small">${waktuFormat}</td>
+                    <td class="fw-bold">${doc["Dokumen"]}</td>
+                    <td><span class="badge bg-secondary">${doc["Kelas"] || "-"}</span></td>
+                    <td>
+                        <a href="${linkDokumen}" target="_blank" class="btn btn-sm btn-tema-kuning shadow-sm fw-bold">
+                            <i class="fa-solid fa-up-right-from-square me-1"></i>Buka Berkas
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

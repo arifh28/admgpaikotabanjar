@@ -1,0 +1,55 @@
+/* Mengimpor font dari Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Ubuntu:wght@400;500;700&display=swap');
+
+:root {
+    --hijau-utama: #198754; /* Bootstrap Success Green */
+    --hijau-gelap: #146c43;
+    --kuning-utama: #ffc107; /* Bootstrap Warning Yellow */
+    --kuning-gelap: #e0a800;
+    --bg-cerah: #f8f9fa;
+}
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+    background-color: var(--bg-cerah);
+    color: #333;
+}
+
+/* Menggunakan Plus Jakarta Sans untuk elemen penekanan */
+h1, h2, h3, h4, h5, h6, .navbar-brand, .btn, .card-title, label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Kelas Kustom untuk Tema */
+.bg-tema-hijau {
+    background-color: var(--hijau-utama) !important;
+    color: white;
+}
+.text-tema-hijau {
+    color: var(--hijau-utama) !important;
+}
+.btn-tema-kuning {
+    background-color: var(--kuning-utama);
+    color: #000;
+    font-weight: 600;
+    border: none;
+}
+.btn-tema-kuning:hover {
+    background-color: var(--kuning-gelap);
+    color: #000;
+}
+.btn-tema-hijau {
+    background-color: var(--hijau-utama);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+.btn-tema-hijau:hover {
+    background-color: var(--hijau-gelap);
+    color: white;
+}
+.kartu-kustom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
