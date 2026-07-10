@@ -53,3 +53,18 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .btn, .card-title, label {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
+/* Mengubah semua elemen melengkung menjadi kotak siku */
+.kartu-kustom, .card, .login-card, .btn, .dropdown-menu {
+    border-radius: 0 !important;
+}
+
+/* Mengubah avatar agar tetap bulat (karena ini standar UI) atau jadikan kotak jika ingin konsisten */
+.avatar-img {
+    border-radius: 0 !important;
+}
+
+/* Menyesuaikan shadow agar tetap elegan meski sudutnya siku */
+.kartu-kustom, .login-card {
+    box-shadow: 0 4px 0px rgba(0, 0, 0, 0.1) !important;
+}
