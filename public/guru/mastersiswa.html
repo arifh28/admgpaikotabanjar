@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Data Siswa - Portal Sekolah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
+    <!-- Pustaka SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc107; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
+        .content-area { padding: 30px; flex-grow: 1; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
+            <div class="sidebar-menu">
+                <a href="/guru/index.html" class="nav-link-custom"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></a>
+                <a href="/guru/masterkelas.html" class="nav-link-custom"><i class="fa-solid fa-chalkboard"></i> <span>Master Kelas</span></a>
+                <a href="/guru/mastersiswa.html" class="nav-link-custom active"><i class="fa-solid fa-user-graduate"></i> <span>Master Siswa</span></a>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0">Master Data Siswa</h3>
+                    <div id="btnGroupTop" class="d-none">
+                        <a href="importsiswa.html" class="btn btn-outline-success shadow-sm me-2">
+                            <i class="fa-solid fa-file-import me-1"></i> Import Massal
+                        </a>
+                        <button class="btn btn-danger shadow-sm me-2" id="btnHapusTerpilih" onclick="hapusTerpilih()" disabled>
+                            <i class="fa-solid fa-trash me-1"></i> Hapus Terpilih (<span id="countHapus">0</span>)
+                        </button>
+                        <button class="btn btn-success shadow-sm" onclick="bukaModal('CREATE')">
+                            <i class="fa-solid fa-plus me-1"></i> Tambah 1 Siswa
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body bg-light p-3">
+                        <label class="fw-bold mb-2">Pilih Kelas untuk Menampilkan Siswa:</label>
+                        <select class="form-select border-success shadow-sm w-50" id="filterKelas" onchange="renderTabelSiswa()">
+                            <option value="">-- Memuat Kelas... --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm d-none" id="tabelCard">
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table id="tabelSiswa" class="table table-striped table-hover mb-0 w-100">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center" width="5%">
+                                            <input class="form-check-input" type="checkbox" id="checkAll" onchange="toggleCheckAll()">
+                                        </th>
+                                        <th class="text-center" width="5%">No.</th>
+                                        <th width="40%">Nama Siswa</th>
+                                        <th width="25%">Jenis Kelamin</th>
+                                        <th class="text-center" width="25%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Form Siswa -->
+    <div class="modal fade" id="modalSiswa" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="modalTitleSiswa">Tambah Siswa Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formSiswa">
+                        <input type="hidden" id="id_siswa">
+                        <input type="hidden" id="metode_simpan_siswa">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pilih Kelas</label>
+                            <select class="form-select border-success" id="input_kelas_modal" required></select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nama Lengkap Siswa</label>
+                            <input type="text" class="form-control" id="nama_siswa" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Jenis Kelamin</label>
+                            <select class="form-select" id="jenis_kelamin" required>
+                                <option value="L">Laki-laki (L)</option>
+                                <option value="P">Perempuan (P)</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="btnSimpanSiswa" onclick="simpanSiswa()">
+                        <i class="fa-solid fa-save me-1"></i> Simpan Siswa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        let currentUser = {};
+        let dataMaster = null; 
+        let datatableInstance = null;
+        const cacheKey = "master_data_cache";
+        const modalSiswaEl = new bootstrap.Modal(document.getElementById('modalSiswa'));
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        async function tarikDataMasterServer() {
+            const request = await fetch("/.netlify/functions/masterdata", { 
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "get_master_data" })
+            });
+            const hasil = await request.json();
+            if (hasil.status === "sukses") {
+                sessionStorage.setItem(cacheKey, JSON.stringify(hasil));
+                return hasil;
+            }
+            throw new Error("Gagal load server");
+        }
+
+        async function initHalaman() {
+            try {
+                const cachedData = sessionStorage.getItem(cacheKey);
+                if (cachedData) dataMaster = JSON.parse(cachedData);
+                else dataMaster = await tarikDataMasterServer();
+
+                const selectKelas = document.getElementById("filterKelas");
+                const kelasku = dataMaster.kelas.filter(k => k.nip_guru === currentUser.Username);
+                
+                selectKelas.innerHTML = '<option value="">-- Silakan Pilih Kelas --</option>';
+                kelasku.forEach(k => {
+                    selectKelas.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
+                });
+            } catch (err) { Swal.fire('Error', 'Terjadi kesalahan sistem.', 'error'); }
+        }
+
+        function renderTabelSiswa() {
+            const idKelasFilter = document.getElementById("filterKelas").value;
+            const btnGroup = document.getElementById("btnGroupTop");
+            
+            if (!idKelasFilter) {
+                document.getElementById("tabelCard").classList.add("d-none");
+                btnGroup.classList.add("d-none");
+                return;
+            }
+            
+            btnGroup.classList.remove("d-none");
+            document.getElementById("checkAll").checked = false;
+            updateTombolHapus(0);
+
+            // 1. PINDAHKAN KE SINI: Hancurkan DataTables lama sebelum mengubah DOM
+            if ($.fn.DataTable.isDataTable('#tabelSiswa')) { 
+                $('#tabelSiswa').DataTable().destroy(); 
+            }
+
+            const siswaFiltered = dataMaster.siswa.filter(s => s.id_kelas === idKelasFilter);
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+            let rowCount = 1;
+
+            siswaFiltered.forEach(row => {
+                const badgeJK = row.jenis_kelamin === 'L' ? '<span class="badge bg-primary">Laki-laki</span>' : '<span class="badge bg-danger">Perempuan</span>';
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="text-center align-middle">
+                        <input class="form-check-input check-item" type="checkbox" value="${row.id_siswa}" onchange="updateCheck()">
+                    </td>
+                    <td class="text-center align-middle">${rowCount++}.</td>
+                    <td class="fw-bold align-middle">${row.nama_siswa}</td>
+                    <td class="align-middle">${badgeJK}</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="bukaModal('UPDATE', '${row.id_siswa}', '${row.nama_siswa}', '${row.jenis_kelamin}', '${row.id_kelas}')"><i class="fa-solid fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="hapusSiswa('${row.id_siswa}')"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("tabelCard").classList.remove("d-none");
+
+            // 2. Inisialisasi ulang DataTables dengan data yang baru
+            datatableInstance = $('#tabelSiswa').DataTable({
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json', search: "Cari Siswa:" },
+                ordering: true, pageLength: 100,
+                columnDefs: [ { orderable: false, targets: [0, 4] } ] 
+            });
+        }
+
+        // ================= LOGIKA MULTI-DELETE =================
+        function toggleCheckAll() {
+            const isChecked = document.getElementById("checkAll").checked;
+            const checkboxes = document.querySelectorAll('.check-item');
+            let count = 0;
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+                if(isChecked) count++;
+            });
+            updateTombolHapus(count);
+        }
+
+        function updateCheck() {
+            const checkboxes = document.querySelectorAll('.check-item');
+            let count = 0;
+            let allChecked = true;
+            
+            checkboxes.forEach(cb => {
+                if (cb.checked) count++;
+                else allChecked = false;
+            });
+            
+            document.getElementById("checkAll").checked = (checkboxes.length > 0 && allChecked);
+            updateTombolHapus(count);
+        }
+
+        function updateTombolHapus(count) {
+            const btn = document.getElementById("btnHapusTerpilih");
+            document.getElementById("countHapus").innerText = count;
+            btn.disabled = count === 0;
+        }
+
+        async function hapusTerpilih() {
+            const checkedBoxes = document.querySelectorAll('.check-item:checked');
+            const idsToDelete = Array.from(checkedBoxes).map(cb => cb.value);
+
+            if (idsToDelete.length === 0) return;
+
+            const konfirmasi = await Swal.fire({
+                title: 'Hapus Massal?',
+                text: `Anda yakin ingin menghapus ${idsToDelete.length} siswa secara permanen?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus Semua!'
+            });
+
+            if (konfirmasi.isConfirmed) {
+                // Tampilkan loading yang tidak bisa diclose
+                Swal.fire({
+                    title: 'Menghapus Data...',
+                    html: 'Mohon tunggu, memproses <b>0</b> dari ' + idsToDelete.length + ' siswa.',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                let sukses = 0;
+                
+                // LOOP SEKUENSIAL UNTUK MENGHINDARI SERVER GAS LOCK/TIMEOUT
+                for (let i = 0; i < idsToDelete.length; i++) {
+                    try {
+                        const request = await fetch("/.netlify/functions/masterdata", {
+                            method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "crud_siswa", method: "DELETE", payload: { id_siswa: idsToDelete[i] } })
+                        });
+                        const res = await request.json();
+                        if (res.status === "sukses") sukses++;
+                        
+                        Swal.getHtmlContainer().querySelector('b').textContent = (i + 1);
+                    } catch (e) { console.error("Gagal hapus id: " + idsToDelete[i]); }
+                }
+
+                dataMaster = await tarikDataMasterServer();
+                renderTabelSiswa();
+
+                Swal.fire('Selesai!', `${sukses} data siswa berhasil dihapus.`, 'success');
+            }
+        }
+        // ========================================================
+
+        function bukaModal(metode, id = "", nama = "", jk = "L", id_kelas_row = "") {
+            document.getElementById("formSiswa").reset();
+            document.getElementById("metode_simpan_siswa").value = metode;
+            
+            const selectKelasModal = document.getElementById("input_kelas_modal");
+            const kelasku = dataMaster.kelas.filter(k => k.nip_guru === currentUser.Username);
+            
+            selectKelasModal.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            kelasku.forEach(k => {
+                selectKelasModal.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
+            });
+
+            if (metode === "CREATE") {
+                document.getElementById("modalTitleSiswa").innerText = "Tambah Siswa Baru";
+                document.getElementById("id_siswa").value = generateUUID();
+                const idKelasAktif = document.getElementById("filterKelas").value;
+                if(idKelasAktif) selectKelasModal.value = idKelasAktif;
+            } else {
+                document.getElementById("modalTitleSiswa").innerText = "Ubah Data Siswa";
+                document.getElementById("id_siswa").value = id;
+                document.getElementById("nama_siswa").value = nama;
+                document.getElementById("jenis_kelamin").value = jk;
+                selectKelasModal.value = id_kelas_row;
+            }
+            modalSiswaEl.show();
+        }
+
+        async function simpanSiswa() {
+            const btn = document.getElementById("btnSimpanSiswa");
+            const id_siswa = document.getElementById("id_siswa").value;
+            const id_kelas = document.getElementById("input_kelas_modal").value;
+            const nama = document.getElementById("nama_siswa").value;
+            const jk = document.getElementById("jenis_kelamin").value;
+            const metode = document.getElementById("metode_simpan_siswa").value;
+
+            if(!id_kelas || !nama) return Swal.fire('Peringatan', 'Lengkapi Kelas dan Nama Siswa!', 'warning');
+
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            const payload = { id_siswa: id_siswa, id_kelas: id_kelas, nip_guru: currentUser.Username, nama_siswa: nama, jenis_kelamin: jk };
+
+            try {
+                const request = await fetch("/.netlify/functions/masterdata", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "crud_siswa", method: metode, payload: payload })
+                });
+                const res = await request.json();
+                if (res.status === "sukses") {
+                    modalSiswaEl.hide();
+                    dataMaster = await tarikDataMasterServer(); 
+                    renderTabelSiswa(); 
+                    Swal.fire('Berhasil', 'Data siswa disimpan.', 'success');
+                } else { Swal.fire('Gagal', 'Gagal menyimpan data.', 'error'); }
+            } catch (e) { Swal.fire('Error', 'Kesalahan jaringan.', 'error'); }
+            
+            btn.innerHTML = `<i class="fa-solid fa-save me-1"></i> Simpan Siswa`;
+            btn.disabled = false;
+        }
+
+        async function hapusSiswa(id) {
+            const konfirmasi = await Swal.fire({
+                title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan!", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Hapus'
+            });
+
+            if(konfirmasi.isConfirmed) {
+                try {
+                    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                    const request = await fetch("/.netlify/functions/masterdata", {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "crud_siswa", method: "DELETE", payload: { id_siswa: id } })
+                    });
+                    const res = await request.json();
+                    if (res.status === "sukses") {
+                        dataMaster = await tarikDataMasterServer();
+                        renderTabelSiswa();
+                        Swal.fire('Terhapus!', 'Data siswa telah dihapus.', 'success');
+                    }
+                } catch (e) { Swal.fire('Error', 'Gagal menghapus.', 'error'); }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi) { window.location.href = "/"; } else {
+                currentUser = JSON.parse(sesi);
+                document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+                initHalaman();
+            }
+        });
+    </script>
+</body>
+</html>

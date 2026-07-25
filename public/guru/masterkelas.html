@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Data Kelas - Portal Sekolah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc107; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
+        .content-area { padding: 30px; flex-grow: 1; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
+            <div class="sidebar-menu">
+                <a href="/guru/index.html" class="nav-link-custom"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></a>
+                <a href="/guru/masterkelas.html" class="nav-link-custom active"><i class="fa-solid fa-chalkboard"></i> <span>Master Kelas</span></a>
+                <a href="/guru/mastersiswa.html" class="nav-link-custom"><i class="fa-solid fa-user-graduate"></i> <span>Master Siswa</span></a>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0">Master Data Kelas</h3>
+                    <button class="btn btn-success shadow-sm" onclick="bukaModal('CREATE')">
+                        <i class="fa-solid fa-plus me-1"></i> Tambah Kelas
+                    </button>
+                </div>
+                
+                <div id="loading" class="alert alert-info border-0 shadow-sm border-start border-4 border-info">
+                    <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat data kelas...
+                </div>
+
+                <div class="card border-0 shadow-sm d-none" id="tabelCard">
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table id="tabelKelas" class="table table-striped table-hover mb-0 w-100">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center" width="5%">No.</th>
+                                        <th width="35%">Nama Kelas</th>
+                                        <th width="25%">Tahun Ajaran</th>
+                                        <th width="20%">Semester</th>
+                                        <th class="text-center" width="15%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Form Kelas -->
+    <div class="modal fade" id="modalKelas" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Tambah Kelas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formKelas">
+                        <input type="hidden" id="id_kelas">
+                        <input type="hidden" id="metode_simpan">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nama Kelas</label>
+                            <input type="text" class="form-control" id="nama_kelas" placeholder="Contoh: Kelas 1A" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tahun Ajaran</label>
+                            <input type="text" class="form-control" id="tahun_ajaran" placeholder="Contoh: 2026/2027" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Semester</label>
+                            <select class="form-select" id="semester" required>
+                                <option value="Ganjil">Ganjil</option>
+                                <option value="Genap">Genap</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="btnSimpan" onclick="simpanKelas()">
+                        <i class="fa-solid fa-save me-1"></i> Simpan Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        let currentUser = {};
+        const cacheKey = "master_data_cache";
+        const modalEl = new bootstrap.Modal(document.getElementById('modalKelas'));
+
+        // Fungsi pembuat UUID v4
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        async function muatDataKelas() {
+            try {
+                let data;
+                const cachedData = sessionStorage.getItem(cacheKey);
+
+                if (cachedData) {
+                    data = JSON.parse(cachedData);
+                } else {
+                    // Pastikan Anda memanggil /masterdata jika sudah dipisahkan
+                    const request = await fetch("/.netlify/functions/masterdata", { 
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "get_master_data" })
+                    });
+                    const hasil = await request.json();
+                    if (hasil.status === "sukses") {
+                        data = hasil; 
+                        sessionStorage.setItem(cacheKey, JSON.stringify(data));
+                    } else { throw new Error("Gagal load server"); }
+                }
+
+                const kelasku = data.kelas.filter(k => k.nip_guru === currentUser.Username);
+                
+                // 1. PINDAHKAN KE SINI: Hancurkan DataTables lama
+                if ($.fn.DataTable.isDataTable('#tabelKelas')) { 
+                    $('#tabelKelas').DataTable().destroy(); 
+                }
+
+                const tbody = document.getElementById("tableBody");
+                tbody.innerHTML = "";
+                let rowCount = 1;
+
+                kelasku.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td class="text-center align-middle">${rowCount++}.</td>
+                        <td class="fw-bold align-middle">${row.nama_kelas}</td>
+                        <td class="align-middle">${row.tahun_ajaran}</td>
+                        <td class="align-middle">${row.semester}</td>
+                        <td class="text-center align-middle">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="bukaModal('UPDATE', '${row.id_kelas}', '${row.nama_kelas}', '${row.tahun_ajaran}', '${row.semester}')"><i class="fa-solid fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="hapusKelas('${row.id_kelas}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("loading").classList.add("d-none");
+                document.getElementById("tabelCard").classList.remove("d-none");
+
+                // 2. Inisialisasi ulang DataTables
+                $('#tabelKelas').DataTable({
+                    language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json', search: "Cari Kelas:" },
+                    ordering: true, pageLength: 25
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan sistem.");
+            }
+        }
+
+        function bukaModal(metode, id = "", nama = "", tahun = "", semester = "Ganjil") {
+            document.getElementById("formKelas").reset();
+            document.getElementById("metode_simpan").value = metode;
+            
+            if (metode === "CREATE") {
+                document.getElementById("modalTitle").innerText = "Tambah Kelas Baru";
+                document.getElementById("id_kelas").value = generateUUID();
+            } else {
+                document.getElementById("modalTitle").innerText = "Ubah Data Kelas";
+                document.getElementById("id_kelas").value = id;
+                document.getElementById("nama_kelas").value = nama;
+                document.getElementById("tahun_ajaran").value = tahun;
+                document.getElementById("semester").value = semester;
+            }
+            modalEl.show();
+        }
+
+        async function simpanKelas() {
+            const btn = document.getElementById("btnSimpan");
+            const id_kelas = document.getElementById("id_kelas").value;
+            const nama = document.getElementById("nama_kelas").value;
+            const tahun = document.getElementById("tahun_ajaran").value;
+            const semester = document.getElementById("semester").value;
+            const metode = document.getElementById("metode_simpan").value;
+
+            if(!nama || !tahun) return alert("Lengkapi data formulir!");
+
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            const payload = { id_kelas: id_kelas, nip_guru: currentUser.Username, nama_kelas: nama, tahun_ajaran: tahun, semester: semester };
+
+            try {
+                const request = await fetch("/.netlify/functions/pembiasaan", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "crud_kelas", method: metode, payload: payload })
+                });
+                const res = await request.json();
+                if (res.status === "sukses") {
+                    sessionStorage.removeItem(cacheKey); // Hapus cache agar refresh data
+                    modalEl.hide();
+                    await muatDataKelas();
+                } else { alert("Gagal menyimpan."); }
+            } catch (e) { alert("Kesalahan jaringan."); }
+            
+            btn.innerHTML = `<i class="fa-solid fa-save me-1"></i> Simpan Data`;
+            btn.disabled = false;
+        }
+
+        async function hapusKelas(id) {
+            if(!confirm("Yakin ingin menghapus kelas ini? Data siswa di dalamnya mungkin akan kehilangan referensi kelas.")) return;
+            try {
+                const request = await fetch("/.netlify/functions/pembiasaan", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "crud_kelas", method: "DELETE", payload: { id_kelas: id } })
+                });
+                const res = await request.json();
+                if (res.status === "sukses") {
+                    sessionStorage.removeItem(cacheKey);
+                    await muatDataKelas();
+                }
+            } catch (e) { alert("Gagal menghapus."); }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi) { window.location.href = "/"; } else {
+                currentUser = JSON.parse(sesi);
+                document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+                muatDataKelas();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilih Kelas - Sholat Fardlu</title>
+    <title>Pilih Kelas - Infaq & Shodaqoh</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS Sidebar & Header standar Anda */
         body { background-color: #f4f6f9; overflow-x: hidden; }
         .wrapper { display: flex; width: 100%; min-height: 100vh; }
         .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
@@ -28,7 +27,6 @@
 </head>
 <body>
     <div class="wrapper" id="main-dashboard">
-        <!-- Sidebar -->
         <nav class="sidebar shadow-lg">
             <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
             <div class="sidebar-menu">
@@ -51,67 +49,47 @@
 
             <main class="content-area">
                 <a href="pembiasaan.html" class="btn btn-outline-secondary mb-3"><i class="fa-solid fa-arrow-left me-2"></i>Kembali ke Menu</a>
-                <h3 class="mb-4 fw-bold">Pilih Kelas - Sholat Fardlu</h3>
+                <h3 class="mb-4 fw-bold">Pilih Kelas - Infaq / Shodaqoh</h3>
                 
                 <div id="loading" class="alert alert-info border-0 shadow-sm border-start border-4 border-info">
                     <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat daftar kelas Anda...
                 </div>
 
-                <div class="row g-4 d-none" id="containerKelas">
-                    <!-- Card Kelas akan dirender di sini via JS -->
-                </div>
+                <div class="row g-4 d-none" id="containerKelas"></div>
             </main>
         </div>
     </div>
 
     <script>
-        // Proses memuat data master kelas dan memfilter sesuai akses Guru
         async function muatDaftarKelas(userData) {
             try {
-                // 1. Tentukan kunci (key) untuk sessionStorage berdasarkan Username (NIP)
                 const cacheKey = `data_pembiasaan_${userData.Username}`;
                 let data;
-
-                // 2. Cek apakah data sudah ada di memori peramban (sessionStorage)
                 const cachedData = sessionStorage.getItem(cacheKey);
 
                 if (cachedData) {
-                    // Jika ADA: Gunakan data dari cache (Akan merender secara instan!)
-                    console.log("Memuat data dari cache memori...");
                     data = JSON.parse(cachedData);
                 } else {
-                    // Jika BELUM ADA: Lakukan fetch ke server GAS
-                    console.log("Memuat data dari server GAS...");
                     const request = await fetch("/.netlify/functions/pembiasaan", { 
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ action: "get_pembiasaan" })
                     });
-
                     const hasil = await request.json();
-
                     if (hasil.status === "sukses") {
                         data = hasil.data; 
-                        
-                        // Simpan seluruh data (termasuk kelas, siswa, dan kehadiran) ke sessionStorage
-                        // Ini akan membuat halaman sholatfardlu_detail.html nantinya juga bisa ikutan super cepat!
                         sessionStorage.setItem(cacheKey, JSON.stringify(data));
                     } else {
                         alert("Gagal mengambil data server.");
-                        return; // Hentikan proses jika gagal
+                        return;
                     }
                 }
                 
-                // 3. Lanjutkan logika filter dan render UI menggunakan variabel 'data'
                 const masterKelas = data.kelas; 
-                
-                // Ambil hak akses kelas dari session
                 const daftarKelasGuruRaw = userData["Daftar Kelas"] || ""; 
                 const arrayKelasGuru = daftarKelasGuruRaw.split(',').map(k => k.trim());
-
                 const container = document.getElementById("containerKelas");
                 
-                // Saring kelas yang hanya menjadi hak milik guru tersebut
                 const kelasDitampilkan = masterKelas.filter(k => 
                     daftarKelasGuruRaw === "" || arrayKelasGuru.includes(k.id_kelas) || arrayKelasGuru.includes(k.nama_kelas)
                 );
@@ -122,8 +100,8 @@
                     kelasDitampilkan.forEach(kelas => {
                         const cardHTML = `
                             <div class="col-md-3">
-                                <a href="sholatfardlu_detail.html?id_kelas=${kelas.id_kelas}&nama_kelas=${encodeURIComponent(kelas.nama_kelas)}" class="card card-kelas h-100 p-4 text-center border shadow-sm">
-                                    <i class="fa-solid fa-users-rectangle fa-3x text-primary mb-3 mt-2"></i>
+                                <a href="infaq_detail.html?id_kelas=${kelas.id_kelas}&nama_kelas=${encodeURIComponent(kelas.nama_kelas)}" class="card card-kelas h-100 p-4 text-center border shadow-sm">
+                                    <i class="fa-solid fa-hand-holding-dollar fa-3x text-primary mb-3 mt-2"></i>
                                     <h5 class="fw-bold text-dark">${kelas.nama_kelas}</h5>
                                 </a>
                             </div>
@@ -132,7 +110,6 @@
                     });
                 }
 
-                // Sembunyikan loading dan tampilkan kartu kelas
                 document.getElementById("loading").classList.add("d-none");
                 container.classList.remove("d-none");
 
@@ -147,11 +124,9 @@
             const sesi = localStorage.getItem('user_session');
             if (!sesi) { window.location.href = "/"; } else {
                 const userData = JSON.parse(sesi);
-                
                 document.getElementById('namaUser').innerText = userData.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
                 document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
-
                 muatDaftarKelas(userData);
             }
         });
