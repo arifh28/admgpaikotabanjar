@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator - Portal Sekolah</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #212529 0%, #343a40 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #0dcaf0; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn, .dropdown-menu { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #212529; }
+        .content-area { padding: 30px; flex-grow: 1; }
+    </style>
+</head>
+<body class="d-none" id="bodyAdmin"> <!-- Disembunyikan sampai divalidasi -->
+
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-user-shield fa-3x text-info mb-2"></i>
+                <h5 class="fw-bold mb-0">Panel Admin</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="index.html" class="nav-link-custom"><i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Guru</span></a>
+                <a href="#" class="nav-link-custom active"><i class="fa-solid fa-gauge-high"></i> <span>Statistik Global</span></a>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi (Super Admin)</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Administrator</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex align-items-center mb-4">
+                    <h3 class="mb-0 fw-bold">Selamat Datang di Halaman Administrator</h3>
+                </div>
+                <div class="card border-0 shadow-sm p-5 text-center bg-light">
+                    <i class="fa-solid fa-lock text-success mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="fw-bold text-dark">Akses Terverifikasi</h4>
+                    <p class="text-muted">Halaman ini diperuntukkan sebagai ruang kerja fitur pengelolaan database tingkat lanjut untuk admin yang berwenang.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                const userData = JSON.parse(sesi);
+                const allowedAdmins = ["198909182020121005", "198709082019031002", "198801112019031004"];
+                
+                // GUARD: Cek apakah NIP terdaftar sebagai Admin
+                if (!allowedAdmins.includes(userData.Username)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Akses Ditolak!',
+                        text: 'Anda tidak memiliki otorisasi untuk membuka Halaman Administrator.',
+                        confirmButtonText: 'Kembali ke Dashboard',
+                        confirmButtonColor: '#198754',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        window.location.href = "index.html";
+                    });
+                    return; // Hentikan script jika tidak diizinkan
+                }
+
+                // Jika lolos, tampilkan halaman dan isi data profil
+                document.getElementById("bodyAdmin").classList.remove("d-none");
+                document.getElementById('namaUser').innerText = userData.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=212529&color=fff&bold=true`;
+            }
+        });
+    </script>
+</body>
+</html>
