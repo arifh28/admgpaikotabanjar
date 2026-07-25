@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async (event, context) => {
     // URL Web App GAS Anda dari Langkah 1
     const GAS_URL = "https://script.google.com/macros/s/AKfycbx3_tOtMK3xYpIqI5g7zESJ59d7GwoZyh_MAqtScdUVqoksiO4iXKI2tnPj0FhSM3uf/exec"; 

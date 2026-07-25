@@ -82,10 +82,10 @@
            MEDIA QUERIES (BLOKIR MOBILE)
            ========================================= */
         @media (max-width: 767.98px) {
-            .wrapper { display: none !important; } /* Sembunyikan dasbor di HP */
+            .wrapper, #unauthorized-view { display: none !important; } 
         }
         @media (min-width: 768px) {
-            .mobile-warning { display: none !important; } /* Sembunyikan peringatan di Laptop */
+            .mobile-warning { display: none !important; } 
         }
     </style>
 </head>
@@ -98,8 +98,20 @@
         <p class="fs-5 opacity-75">Silahkan Buka di Laptop untuk membuka aplikasi.<br>Di Handphone buka lewat aplikasi saja.</p>
     </div>
 
+    <!-- Peringatan Akses Ditolak (Khusus Non-Guru) -->
+    <div id="unauthorized-view" class="d-none min-vh-100 flex-column justify-content-center align-items-center bg-light p-4">
+        <div class="card kartu-kustom border-0 shadow text-center p-5" style="max-width: 550px;">
+            <i class="fa-solid fa-triangle-exclamation fa-5x text-danger mb-4"></i>
+            <h2 class="fw-bold mb-3">Akses Ditolak</h2>
+            <p id="pesan-error-role" class="text-muted mb-4 fs-5">Memuat otorisasi...</p>
+            <button class="btn btn-danger btn-lg fw-bold w-100 mt-2" onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>Keluar dan Kembali ke Login
+            </button>
+        </div>
+    </div>
+
     <!-- Dasbor Untuk Pengguna Laptop/Desktop -->
-    <div class="wrapper">
+    <div class="wrapper" id="main-dashboard">
         <nav class="sidebar shadow-lg">
             <div class="sidebar-header">
                 <i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i>
@@ -195,12 +207,22 @@
                 
                 // Route Guard: Pastikan yang masuk adalah Guru
                 if (userData.Role !== "Guru") {
-                    alert("Akses Ditolak! Anda bukan Guru.");
-                    window.location.href = "/";
-                    return;
+                    // 1. Sembunyikan Dasbor Utama agar Sidebar & Top Header tidak bisa diakses
+                    document.getElementById('main-dashboard').classList.add('d-none');
+                    document.getElementById('main-dashboard').classList.remove('d-flex');
+                    
+                    // 2. Tampilkan Layar Error
+                    const errorView = document.getElementById('unauthorized-view');
+                    errorView.classList.remove('d-none');
+                    errorView.classList.add('d-flex');
+                    
+                    // 3. Parsing Teks Dinamis
+                    document.getElementById('pesan-error-role').innerHTML = `Akun Anda terdaftar sebagai <strong>${userData.Role || 'Role Tidak Dikenal'}</strong>.<br>Halaman ini dikhususkan untuk Guru.`;
+                    
+                    return; // Hentikan eksekusi script selanjutnya
                 }
 
-                // Isi data ke antarmuka
+                // Isi data ke antarmuka jika role benar
                 document.getElementById('namaUser').innerText = userData.Nama_Lengkap;
                 document.getElementById('namaSapaan').innerText = userData.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
