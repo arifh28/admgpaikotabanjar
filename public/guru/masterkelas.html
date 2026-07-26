@@ -7,55 +7,31 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
+    <!-- TAMBAHAN: Pustaka SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body { background-color: #f4f6f9; overflow-x: hidden; }
         .wrapper { display: flex; width: 100%; min-height: 100vh; }
         .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
         .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
         .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
-        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: 0.2s; font-weight: 500; }
         .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc107; }
-        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .nav-link-custom .menu-left { display: flex; align-items: center; }
+        .nav-link-custom .menu-left i { width: 30px; font-size: 1.1rem; }
+        .collapse-icon { transition: transform 0.3s ease; font-size: 0.8rem; opacity: 0.7; }
+        .nav-link-custom[aria-expanded="true"] .collapse-icon { transform: rotate(180deg); }
+        .submenu { background-color: rgba(0, 0, 0, 0.15); }
+        .submenu .nav-link-custom { padding-left: 50px; font-size: 0.95rem; padding-top: 10px; padding-bottom: 10px; }
+        .submenu .nav-link-custom i { width: 25px; font-size: 1rem; }
         .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
         .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
         .user-profile { display: flex; align-items: center; gap: 15px; }
         .avatar-img, .card, .btn { border-radius: 0 !important; }
         .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
         .content-area { padding: 30px; flex-grow: 1; }
-        /* Modifikasi untuk Dropdown Sidebar */
-        .nav-link-custom {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; /* Ubah agar panah bisa didorong ke kanan */
-        }
-        .nav-link-custom .menu-text {
-            display: flex;
-            align-items: center;
-            flex-grow: 1; /* Mengambil sisa ruang */
-        }
-        .collapse-icon {
-            transition: transform 0.3s ease;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-        /* Panah berputar ke atas saat menu terbuka */
-        .nav-link-custom[aria-expanded="true"] .collapse-icon {
-            transform: rotate(180deg);
-        }
-        /* Styling khusus untuk anak menu */
-        .submenu {
-            background-color: rgba(0, 0, 0, 0.15); /* Latar belakang sedikit lebih gelap */
-        }
-        .submenu .nav-link-custom {
-            padding-left: 55px; /* Menjorok ke dalam */
-            font-size: 0.95rem;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        .submenu .nav-link-custom i {
-            width: 25px;
-            font-size: 1rem;
-        }
     </style>
 </head>
 <body>
@@ -63,14 +39,12 @@
         <nav class="sidebar shadow-lg">
             <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
             <div class="sidebar-menu">
-                <!-- 1. Menu Dashboard (Tunggal) -->
-                <a href="/guru/index.html" class="nav-link-custom active">
-                    <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
+                <a href="/guru/index.html" class="nav-link-custom">
+                    <div class="menu-left"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
                 </a>
 
-                <!-- 2. Menu Master Data (Dropdown) -->
                 <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
-                    <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
+                    <div class="menu-left"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
                 </a>
                 <div class="collapse submenu" id="menuMaster">
@@ -82,9 +56,8 @@
                     </a>
                 </div>
 
-                <!-- 3. Menu Pembiasaan (Dropdown) -->
                 <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
-                    <div class="menu-text"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
+                    <div class="menu-left"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
                 </a>
                 <div class="collapse submenu" id="menuPembiasaan">
@@ -107,10 +80,21 @@
                         <i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma
                     </a>
                 </div>
-                
-                <!-- 4. Menu Admin (Disembunyikan secara default, diaktifkan via JS) -->
+                <!-- Menu Generator (Aktif) -->
+                <a href="#menuGenerator" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-file-word"></i> <span>Administrasi</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuGenerator">
+                    <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
+                    <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
+                    <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
+                    <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
+                </div>
                 <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
-                    <div class="menu-text"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
+                    <div class="menu-left"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
                 </a>
             </div>
             <div class="p-3 text-center">
@@ -120,26 +104,22 @@
 
         <div class="main-panel">
             <header class="top-header">
-    <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
-    <div class="user-profile dropdown">
-        <div class="text-end">
-            <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
-            <small class="text-muted" id="nipUser">NIP: -</small>
-        </div>
-        
-        <!-- Pemicu Dropdown -->
-        <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
-        </a>
-        
-        <!-- Isi Menu Dropdown -->
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-            <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Profil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
-        </ul>
-    </div>
-</header>
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
 
             <main class="content-area">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -214,6 +194,7 @@
         </div>
     </div>
 
+    <!-- PUSTAKA JAVASCRIPT: Pastikan Susunannya Tidak Berubah -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -224,7 +205,6 @@
         const cacheKey = "master_data_cache";
         const modalEl = new bootstrap.Modal(document.getElementById('modalKelas'));
 
-        // Fungsi pembuat UUID v4
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -240,7 +220,6 @@
                 if (cachedData) {
                     data = JSON.parse(cachedData);
                 } else {
-                    // Pastikan Anda memanggil /masterdata jika sudah dipisahkan
                     const request = await fetch("/.netlify/functions/masterdata", { 
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -255,7 +234,6 @@
 
                 const kelasku = data.kelas.filter(k => k.nip_guru === currentUser.Username);
                 
-                // 1. PINDAHKAN KE SINI: Hancurkan DataTables lama
                 if ($.fn.DataTable.isDataTable('#tabelKelas')) { 
                     $('#tabelKelas').DataTable().destroy(); 
                 }
@@ -282,14 +260,13 @@
                 document.getElementById("loading").classList.add("d-none");
                 document.getElementById("tabelCard").classList.remove("d-none");
 
-                // 2. Inisialisasi ulang DataTables
                 $('#tabelKelas').DataTable({
                     language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json', search: "Cari Kelas:" },
                     ordering: true, pageLength: 25
                 });
             } catch (err) {
                 console.error(err);
-                alert("Terjadi kesalahan sistem.");
+                Swal.fire('Error', 'Terjadi kesalahan sistem saat memuat data.', 'error');
             }
         }
 
@@ -318,7 +295,9 @@
             const semester = document.getElementById("semester").value;
             const metode = document.getElementById("metode_simpan").value;
 
-            if(!nama || !tahun) return alert("Lengkapi data formulir!");
+            if(!nama || !tahun) {
+                return Swal.fire('Peringatan', 'Silakan lengkapi formulir pendaftaran kelas!', 'warning');
+            }
 
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
             btn.disabled = true;
@@ -326,47 +305,111 @@
             const payload = { id_kelas: id_kelas, nip_guru: currentUser.Username, nama_kelas: nama, tahun_ajaran: tahun, semester: semester };
 
             try {
-                const request = await fetch("/.netlify/functions/pembiasaan", {
+                const request = await fetch("/.netlify/functions/masterdata", {
                     method: "POST", headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "crud_kelas", method: metode, payload: payload })
                 });
                 const res = await request.json();
                 if (res.status === "sukses") {
-                    sessionStorage.removeItem(cacheKey); // Hapus cache agar refresh data
+                    sessionStorage.removeItem(cacheKey);
                     modalEl.hide();
+                    
+                    Swal.fire({
+                        title: 'Menyegarkan Data...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+                    
                     await muatDataKelas();
-                } else { alert("Gagal menyimpan."); }
-            } catch (e) { alert("Kesalahan jaringan."); }
+                    Swal.fire('Berhasil', 'Data kelas telah disimpan.', 'success');
+                } else {
+                    Swal.fire('Gagal', 'Sistem menolak untuk menyimpan data.', 'error');
+                }
+            } catch (e) { 
+                Swal.fire('Error Jaringan', 'Terputus dengan server saat mencoba menyimpan data.', 'error');
+            }
             
             btn.innerHTML = `<i class="fa-solid fa-save me-1"></i> Simpan Data`;
             btn.disabled = false;
         }
 
         async function hapusKelas(id) {
-            if(!confirm("Yakin ingin menghapus kelas ini? Data siswa di dalamnya mungkin akan kehilangan referensi kelas.")) return;
-            try {
-                const request = await fetch("/.netlify/functions/pembiasaan", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "crud_kelas", method: "DELETE", payload: { id_kelas: id } })
-                });
-                const res = await request.json();
-                if (res.status === "sukses") {
-                    sessionStorage.removeItem(cacheKey);
-                    await muatDataKelas();
+            const konfirmasi = await Swal.fire({
+                title: 'Hapus Kelas?',
+                text: "Yakin ingin menghapus kelas ini? Peringatan: Data siswa yang terkait dengan kelas ini akan kehilangan referensinya.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus Kelas!'
+            });
+
+            if(konfirmasi.isConfirmed) {
+                try {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Meneruskan instruksi penghapusan ke server Google',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    const request = await fetch("/.netlify/functions/masterdata", {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "crud_kelas", method: "DELETE", payload: { id_kelas: id } })
+                    });
+                    const res = await request.json();
+                    
+                    if (res.status === "sukses") {
+                        sessionStorage.removeItem(cacheKey);
+                        await muatDataKelas();
+                        Swal.fire('Terhapus!', 'Kelas telah berhasil dihapus dari sistem.', 'success');
+                    } else {
+                        Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data di Google Sheets.', 'error');
+                    }
+                } catch (e) { 
+                    Swal.fire('Error Jaringan', 'Gagal terhubung dengan server.', 'error');
                 }
-            } catch (e) { alert("Gagal menghapus."); }
+            }
         }
 
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
             if (!sesi) { window.location.href = "/"; } else {
                 currentUser = JSON.parse(sesi);
+                
+                const allowedAdmins = ["198909182020121005", "198709082019031002", "198801112019031004"];
+                if (allowedAdmins.includes(currentUser.Username)) {
+                    document.getElementById("sidebarMenuAdmin").classList.remove("d-none");
+                }
+
                 document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
                 document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
                 muatDataKelas();
             }
+
+            const currentUrl = window.location.pathname;
+            
+            document.querySelectorAll('.sidebar-menu > a.nav-link-custom').forEach(link => {
+                if (currentUrl.includes(link.getAttribute('href')) && link.getAttribute('href') !== '#') {
+                    link.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.submenu a.nav-link-custom').forEach(link => {
+                if (currentUrl.includes(link.getAttribute('href'))) {
+                    link.classList.add('active'); 
+                    
+                    const parentCollapse = link.closest('.collapse');
+                    if (parentCollapse) {
+                        parentCollapse.classList.add('show');
+                        const trigger = document.querySelector(`[href="#${parentCollapse.id}"]`);
+                        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            });
         });
+
         function logout() {
             localStorage.removeItem('user_session');
             window.location.href = "/";

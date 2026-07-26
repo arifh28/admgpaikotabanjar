@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Program Tahunan (PROTA)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* Gaya dasar dari mastersiswa.html */
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc107; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn, .dropdown-menu { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
+        .content-area { padding: 30px; flex-grow: 1; }
+        
+        /* Modifikasi untuk Dropdown Sidebar */
+        .nav-link-custom { display: flex; align-items: center; justify-content: flex-start; }
+        .nav-link-custom .menu-text { display: flex; align-items: center; flex-grow: 1; }
+        .collapse-icon { transition: transform 0.3s ease; font-size: 0.8rem; opacity: 0.7; }
+        .nav-link-custom[aria-expanded="true"] .collapse-icon { transform: rotate(180deg); }
+        .submenu { background-color: rgba(0, 0, 0, 0.15); }
+        .submenu .nav-link-custom { padding-left: 55px; font-size: 0.95rem; padding-top: 10px; padding-bottom: 10px; }
+        .submenu .nav-link-custom i { width: 25px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
+            <div class="sidebar-menu">
+                <a href="/guru/index.html" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
+                </a>
+
+                <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuMaster">
+                    <a href="/guru/masterkelas.html" class="nav-link-custom">
+                        <i class="fa-solid fa-chalkboard text-primary"></i> Data Kelas
+                    </a>
+                    <a href="/guru/mastersiswa.html" class="nav-link-custom">
+                        <i class="fa-solid fa-user-graduate text-info"></i> Data Siswa
+                    </a>
+                </div>
+
+                <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuPembiasaan">
+                    <a href="/guru/sholatfardlu.html" class="nav-link-custom"><i class="fa-solid fa-mosque text-primary"></i> Sholat Fardlu</a>
+                    <a href="/guru/sholatsunat.html" class="nav-link-custom"><i class="fa-solid fa-hands-praying text-success"></i> Sholat Sunat</a>
+                    <a href="/guru/infaq.html" class="nav-link-custom"><i class="fa-solid fa-hand-holding-dollar text-warning"></i> Infaq / Sodaqoh</a>
+                    <a href="/guru/diniyah.html" class="nav-link-custom"><i class="fa-solid fa-school text-danger"></i> Diniyah</a>
+                    <a href="/guru/hafalandoa.html" class="nav-link-custom"><i class="fa-solid fa-book-open text-info"></i> Hafalan Doa</a>
+                    <a href="/guru/juzamma.html" class="nav-link-custom"><i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma</a>
+                </div>
+                
+                <!-- Menu Generator (Aktif) -->
+                <a href="#menuGenerator" data-bs-toggle="collapse" aria-expanded="true" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-file-word"></i> <span>Administrasi</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse show submenu" id="menuGenerator">
+                    <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom active"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
+                    <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
+                    <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
+                    <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
+                </div>
+                
+                <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
+                    <div class="menu-text"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
+                </a>
+            </div>
+            <div class="p-3 text-center">
+                <p class="small opacity-50 mb-0" id="namaSekolahTeks">Memuat sekolah...</p>
+            </div>
+        </nav>
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-file-contract text-success me-2"></i>Program Tahunan (PROTA)</h3>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white pt-4 pb-3 border-0">
+                        <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-list-check me-2"></i>Daftar Template per Kelas</h5>
+                        <p class="text-muted small mt-1 mb-0">Klik tombol "Buat & Unduh" untuk meracik dokumen secara otomatis dengan nama Anda.</p>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0 w-100">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center" width="10%">Kelas</th>
+                                        <th width="25%">Jenis Dokumen</th>
+                                        <th class="text-center" width="20%">Status</th>
+                                        <th class="text-center" width="20%">Arsip File</th>
+                                        <th class="text-center" width="25%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelDokumen">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <i class="fa-solid fa-spinner fa-spin fa-2x text-success mb-2"></i>
+                                            <p class="mb-0 text-muted">Menarik data dari server...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let currentUser = {};
+
+        // 1. Inisialisasi Saat Halaman Dimuat (Sama seperti mastersiswa)
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                currentUser = JSON.parse(sesi);
+                
+                // Render Profil di Top Header
+                document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
+                document.getElementById('namaSekolahTeks').innerText = currentUser["Nama Sekolah"] || "-";
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+                
+                // Muat Data Dokumen
+                loadDataDokumen();
+            }
+        });
+
+        // 2. Logout Function
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+
+        // 3. Tarik Master Dokumen dari Server
+        async function loadDataDokumen() {
+            const tbody = document.getElementById('tabelDokumen');
+            try {
+                const response = await fetch("/.netlify/functions/dokumen", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: 'get_master_dokumen',
+                        nip: currentUser.Username,
+                        jenis_dokumen: 'Program Tahunan' // Ubah untuk prosem, kktp, dll
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'sukses') {
+                    renderTabel(result.data);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Terjadi kesalahan jaringan/koneksi server.</td></tr>`;
+            }
+        }
+
+        // 4. Render Tabel Dokumen (Terintegrasi Caching)
+        function renderTabel(data) {
+            const tbody = document.getElementById('tabelDokumen');
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada template Program Tahunan untuk Anda.</td></tr>`;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                // KUNCI CACHE: Kombinasikan Jenis Dokumen dan Kelas
+                const cacheKey = `arsip_${item.dokumen}_${item.kelas}`;
+                const cachedUrl = localStorage.getItem(cacheKey);
+
+                // Prioritaskan LocalStorage. Jika tidak ada, lihat status dari server.
+                const isPrinted = cachedUrl ? true : item.is_printed;
+                const fileUrl = cachedUrl ? cachedUrl : item.file_url;
+
+                // Label Status
+                const statusBadge = isPrinted 
+                    ? `<span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check me-1"></i>Sudah Dibuat</span>`
+                    : `<span class="badge bg-warning text-dark px-3 py-2"><i class="fa-solid fa-hourglass-half me-1"></i>Belum Dibuat</span>`;
+                
+                // Link Google Docs / Word
+                const linkArsip = isPrinted && fileUrl
+                    ? `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-cloud-arrow-down me-1"></i>Akses Arsip</a>`
+                    : `<span class="text-muted small">-</span>`;
+
+                // Tombol Aksi Generate
+                const aksiBtn = `<button class="btn btn-success btn-sm w-100 fw-bold" id="btnGen_${index}" 
+                                    onclick="generateDocs('${item.dokumen}', '${item.kelas}', '${item.id_docs}', ${index})">
+                                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Buat & Unduh
+                                 </button>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center fw-bold h5 align-middle mb-0">${item.kelas}</td>
+                    <td class="align-middle fw-semibold">${item.dokumen}</td>
+                    <td class="text-center align-middle">${statusBadge}</td>
+                    <td class="text-center align-middle">${linkArsip}</td>
+                    <td class="align-middle">${aksiBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 5. Eksekusi Pembuatan Dokumen
+        async function generateDocs(jenisDokumen, kelas, templateId, idTombol) {
+            const btn = document.getElementById(`btnGen_${idTombol}`);
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Meracik...`;
+            btn.disabled = true;
+
+            const payload = {
+                action: 'generate_dokumen',
+                template_id: templateId,
+                dokumen: jenisDokumen,
+                kelas: kelas,
+                nip: currentUser.Username,
+                nama: currentUser.Nama_Lengkap,
+                sekolah: currentUser["Nama Sekolah"],
+                kepsek: currentUser["Kepala Sekolah"],
+                nip_kepsek: currentUser["NIP Kepala Sekolah"],
+                pengawas: currentUser.Pengawas,
+                nip_kepsek: currentUser["NIP Pengawas"]
+            };
+
+            try {
+                const response = await fetch("/.netlify/functions/dokumen", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'sukses') {
+                    // SIMPAN URL UNDUHAN KE LOCAL STORAGE
+                    const cacheKey = `arsip_${jenisDokumen}_${kelas}`;
+                    localStorage.setItem(cacheKey, result.download_url);
+
+                    Swal.fire({
+                        title: 'Sukses!',
+                        text: `Dokumen ${jenisDokumen} berhasil diracik dan akan otomatis diunduh.`,
+                        icon: 'success',
+                        confirmButtonColor: '#198754'
+                    }).then(() => {
+                        window.location.href = result.download_url;
+                        loadDataDokumen(); // Memuat ulang tabel untuk merender badge Hijau
+                    });
+                } else {
+                    Swal.fire('Gagal', result.message, 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Kesalahan jaringan atau server gagal merespons.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

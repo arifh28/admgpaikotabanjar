@@ -139,7 +139,19 @@
                         <i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma
                     </a>
                 </div>
-                
+                <!-- Menu Generator (Aktif) -->
+                <a href="#menuGenerator" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-file-word"></i> <span>Administrasi</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuGenerator">
+                    <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
+                    <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
+                    <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
+                    <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
+                </div>
                 <!-- 4. Menu Admin (Disembunyikan secara default, diaktifkan via JS) -->
                 <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
                     <div class="menu-text"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
@@ -220,21 +232,6 @@
                 </div>
 
                 <div class="row g-4">
-                    <div class="col-md-6">
-                        <a href="pembiasaan.html" class="card card-menu h-100 p-5 text-center border-0 shadow-sm border-top border-4 border-success">
-                            <i class="fa-solid fa-clipboard-list fa-4x text-success mb-4 opacity-75"></i>
-                            <h4 class="card-title fw-bold">Input Pembiasaan</h4>
-                            <p class="text-muted mb-4">Rekam catatan sholat dhuha, sholat 5 waktu, dan diniyah siswa hari ini dengan cepat dan mudah.</p>
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="masterkelas.html" class="card card-menu h-100 p-5 text-center border-0 shadow-sm border-top border-4 border-primary">
-                            <i class="fa-solid fa-database fa-4x text-primary mb-4 opacity-75"></i>
-                            <h4 class="card-title fw-bold">Master Data</h4>
-                            <p class="text-muted mb-4">Kelola data kelas dan siswa secara terpusat untuk keperluan absensi dan pembiasaan harian.</p>
-                        </a>
-                    </div>
-                    
                     <!-- Card Admin (Disembunyikan secara default) -->
                     <div class="col-md-12 d-none" id="cardAdmin">
                         <a href="admin.html" class="card card-menu h-100 p-4 text-center border-0 shadow-sm border-top border-4 border-dark bg-light">
@@ -247,6 +244,25 @@
                             </div>
                         </a>
                     </div>
+
+                    <!-- Card Profil Lengkap / Sesi -->
+                    <div class="col-md-12 mt-4">
+                        <div class="card border-0 shadow-sm border-top border-4 border-info">
+                            <div class="card-header bg-white border-0 pt-4 pb-0">
+                                <h5 class="fw-bold"><i class="fa-solid fa-id-card text-info me-2"></i>Data Profil Lengkap</h5>                                
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped" id="tabelSession">
+                                        <tbody>
+                                            <!-- Data akan disuntikkan secara otomatis melalui JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </main>
         </div>
@@ -337,6 +353,28 @@
                 const allowedAdmins = ["198909182020121005", "198709082019031002", "198801112019031004"];
                 if (allowedAdmins.includes(userData.Username)) {
                     document.getElementById("cardAdmin").classList.remove("d-none");
+                }
+
+                // --- SUNTIKKAN DATA SESSION KE TABEL PROFIL LENGKAP ---
+                const tableBody = document.querySelector("#tabelSession tbody");
+                tableBody.innerHTML = ""; // Bersihkan isi tabel sebelumnya (jika ada)
+
+                // Looping semua kunci (key) dan nilai (value) yang ada di dalam userData
+                for (const [key, value] of Object.entries(userData)) {
+                    // Buat baris baru untuk setiap data
+                    const tr = document.createElement("tr");
+                    
+                    // Format tampilan jika datanya kosong
+                    let displayValue = value;
+                    if (value === "" || value === null || value === undefined) {
+                        displayValue = '<span class="badge bg-secondary opacity-50">Kosong / Tidak Diisi</span>';
+                    }
+
+                    tr.innerHTML = `
+                        <td width="35%" class="fw-bold text-muted bg-light">${key}</td>
+                        <td width="65%">${displayValue}</td>
+                    `;
+                    tableBody.appendChild(tr);
                 }
 
                 // Panggil fungsi statistik
