@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Program Tahunan (PROTA)</title>
+    <title>Generator RPPM - Portal Sekolah</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        /* Gaya dasar dari mastersiswa.html */
         body { background-color: #f4f6f9; overflow-x: hidden; }
         .wrapper { display: flex; width: 100%; min-height: 100vh; }
         .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
@@ -26,7 +25,6 @@
         .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
         .content-area { padding: 30px; flex-grow: 1; }
         
-        /* Modifikasi untuk Dropdown Sidebar */
         .nav-link-custom { display: flex; align-items: center; justify-content: flex-start; }
         .nav-link-custom .menu-text { display: flex; align-items: center; flex-grow: 1; }
         .collapse-icon { transition: transform 0.3s ease; font-size: 0.8rem; opacity: 0.7; }
@@ -51,12 +49,8 @@
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
                 </a>
                 <div class="collapse submenu" id="menuMaster">
-                    <a href="/guru/masterkelas.html" class="nav-link-custom">
-                        <i class="fa-solid fa-chalkboard text-primary"></i> Data Kelas
-                    </a>
-                    <a href="/guru/mastersiswa.html" class="nav-link-custom">
-                        <i class="fa-solid fa-user-graduate text-info"></i> Data Siswa
-                    </a>
+                    <a href="/guru/masterkelas.html" class="nav-link-custom"><i class="fa-solid fa-chalkboard text-primary"></i> Data Kelas</a>
+                    <a href="/guru/mastersiswa.html" class="nav-link-custom"><i class="fa-solid fa-user-graduate text-info"></i> Data Siswa</a>
                 </div>
 
                 <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
@@ -79,11 +73,11 @@
                 </a>
                 <div class="collapse show submenu" id="menuGenerator">
                     <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
-                    <a href="/guru/prosem.html" class="nav-link-custom active"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
                     <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
                     <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
                     <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
-                    <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
+                    <a href="/guru/rpm.html" class="nav-link-custom active"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
                     <a href="/guru/jurnal.html" class="nav-link-custom"><i class="fa-solid fa-book-bookmark text-primary"></i> JURNAL</a>
                 </div>
                 
@@ -118,13 +112,13 @@
 
             <main class="content-area">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-file-contract text-success me-2"></i>Program Tahunan (PROTA)</h3>
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-secondary me-2"></i>Rencana Pelaksanaan Pembelajaran (RPPM)</h3>
                 </div>
 
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white pt-4 pb-3 border-0">
-                        <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-list-check me-2"></i>Daftar Template per Kelas</h5>
-                        <p class="text-muted small mt-1 mb-0">Klik tombol "Buat & Unduh" untuk meracik dokumen secara otomatis dengan nama Anda.</p>
+                        <h5 class="fw-bold mb-0 text-secondary"><i class="fa-solid fa-file-word me-2"></i>Daftar Template RPPM per Kelas</h5>
+                        <p class="text-muted small mt-1 mb-0">Klik tombol "Buat & Unduh" untuk meracik dokumen format MS Word secara otomatis.</p>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -141,7 +135,7 @@
                                 <tbody id="tabelDokumen">
                                     <tr>
                                         <td colspan="5" class="text-center py-5">
-                                            <i class="fa-solid fa-spinner fa-spin fa-2x text-success mb-2"></i>
+                                            <i class="fa-solid fa-spinner fa-spin fa-2x text-secondary mb-2"></i>
                                             <p class="mb-0 text-muted">Menarik data dari server...</p>
                                         </td>
                                     </tr>
@@ -160,7 +154,6 @@
     <script>
         let currentUser = {};
 
-        // 1. Inisialisasi Saat Halaman Dimuat (Sama seperti mastersiswa)
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
             if (!sesi) {
@@ -168,24 +161,20 @@
             } else {
                 currentUser = JSON.parse(sesi);
                 
-                // Render Profil di Top Header
                 document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
                 document.getElementById('namaSekolahTeks').innerText = currentUser["Nama Sekolah"] || "-";
                 document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
                 
-                // Muat Data Dokumen
                 loadDataDokumen();
             }
         });
 
-        // 2. Logout Function
         function logout() {
             localStorage.removeItem('user_session');
             window.location.href = "/";
         }
 
-        // 3. Tarik Master Dokumen dari Server
         async function loadDataDokumen() {
             const tbody = document.getElementById('tabelDokumen');
             try {
@@ -195,7 +184,7 @@
                     body: JSON.stringify({
                         action: 'get_master_dokumen',
                         nip: currentUser.Username,
-                        jenis_dokumen: 'Program Tahunan' // Ubah untuk prosem, kktp, dll
+                        jenis_dokumen: 'RPPM' // Memanggil RPPM dari Master_RPP
                     })
                 });
 
@@ -211,37 +200,31 @@
             }
         }
 
-        // 4. Render Tabel Dokumen (Terintegrasi Caching)
         function renderTabel(data) {
             const tbody = document.getElementById('tabelDokumen');
             tbody.innerHTML = "";
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada template Program Tahunan untuk Anda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada template RPPM untuk Anda.</td></tr>`;
                 return;
             }
 
             data.forEach((item, index) => {
-                // KUNCI CACHE: Kombinasikan Jenis Dokumen dan Kelas
                 const cacheKey = `arsip_${item.dokumen}_${item.kelas}`;
                 const cachedUrl = localStorage.getItem(cacheKey);
 
-                // Prioritaskan LocalStorage. Jika tidak ada, lihat status dari server.
                 const isPrinted = cachedUrl ? true : item.is_printed;
                 const fileUrl = cachedUrl ? cachedUrl : item.file_url;
 
-                // Label Status
                 const statusBadge = isPrinted 
                     ? `<span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check me-1"></i>Sudah Dibuat</span>`
                     : `<span class="badge bg-warning text-dark px-3 py-2"><i class="fa-solid fa-hourglass-half me-1"></i>Belum Dibuat</span>`;
                 
-                // Link Google Docs / Word
                 const linkArsip = isPrinted && fileUrl
                     ? `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-cloud-arrow-down me-1"></i>Akses Arsip</a>`
                     : `<span class="text-muted small">-</span>`;
 
-                // Tombol Aksi Generate
-                const aksiBtn = `<button class="btn btn-success btn-sm w-100 fw-bold" id="btnGen_${index}" 
+                const aksiBtn = `<button class="btn btn-secondary btn-sm w-100 fw-bold" id="btnGen_${index}" 
                                     onclick="generateDocs('${item.dokumen}', '${item.kelas}', '${item.id_docs}', ${index})">
                                     <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Buat & Unduh
                                  </button>`;
@@ -258,7 +241,6 @@
             });
         }
 
-        // 5. Eksekusi Pembuatan Dokumen
         async function generateDocs(jenisDokumen, kelas, templateId, idTombol) {
             const btn = document.getElementById(`btnGen_${idTombol}`);
             const originalText = btn.innerHTML;
@@ -277,7 +259,7 @@
                 kepsek: currentUser["Kepala Sekolah"],
                 nip_kepsek: currentUser["NIP Kepala Sekolah"],
                 pengawas: currentUser.Pengawas,
-                nip_kepsek: currentUser["NIP Pengawas"]
+                nip_pengawas: currentUser["NIP Pengawas"]
             };
 
             try {
@@ -290,7 +272,6 @@
                 const result = await response.json();
                 
                 if (result.status === 'sukses') {
-                    // SIMPAN URL UNDUHAN KE LOCAL STORAGE
                     const cacheKey = `arsip_${jenisDokumen}_${kelas}`;
                     localStorage.setItem(cacheKey, result.download_url);
 
@@ -298,10 +279,10 @@
                         title: 'Sukses!',
                         text: `Dokumen ${jenisDokumen} berhasil diracik dan akan otomatis diunduh.`,
                         icon: 'success',
-                        confirmButtonColor: '#198754'
+                        confirmButtonColor: '#6c757d'
                     }).then(() => {
                         window.location.href = result.download_url;
-                        loadDataDokumen(); // Memuat ulang tabel untuk merender badge Hijau
+                        loadDataDokumen(); 
                     });
                 } else {
                     Swal.fire('Gagal', result.message, 'error');
