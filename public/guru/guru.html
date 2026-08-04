@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Guru - Portal Sekolah</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #212529 0%, #343a40 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #0dcaf0; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn, .dropdown-menu { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #212529; }
+        .content-area { padding: 30px; flex-grow: 1; }
+    </style>
+</head>
+<body class="d-none" id="bodyAdmin">
+
+    <div class="wrapper">
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-user-shield fa-3x text-info mb-2"></i>
+                <h5 class="fw-bold mb-0">Panel Admin</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="index.html" class="nav-link-custom"><i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Web</span></a>
+                <a href="admin.html" class="nav-link-custom"><i class="fa-solid fa-gauge-high"></i> <span>Statistik Global</span></a>
+                <a href="guru.html" class="nav-link-custom active"><i class="fa-solid fa-users-gear"></i> <span>Manajemen Guru</span></a>
+            </div>
+        </nav>
+
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi (Super Admin)</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Administrator</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0">Manajemen Data Guru</h3>                    
+                </div>
+                <div class="row mt-5 mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="inputPencarian" placeholder="Cari Nama, NIP, atau Asal Sekolah...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">  
+                        <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
+                            <i class="fa-solid fa-plus me-2"></i>Tambah Guru
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm bg-white" style="border-radius: 12px;">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="ps-4">Nama Lengkap</th>
+                                        <th>NIP (Username)</th>
+                                        <th>Role</th>
+                                        <th>Asal Sekolah</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center pe-4">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelDataGuru">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fa-solid fa-spinner fa-spin fa-2x mb-2 text-primary"></i>
+                                            <p class="mb-0">Memuat data guru dari server...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Guru -->
+    <div class="modal fade" id="modalTambahGuru" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title fw-bold">Tambah Data Guru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formTambahGuru">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="inputNama" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">NIP (Menjadi Username)</label>
+                            <input type="text" class="form-control" id="inputNip" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password Default</label>
+                            <input type="text" class="form-control" id="inputPassword" value="123456" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nama Sekolah</label>
+                            <input type="text" class="form-control" id="inputSekolah" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold mt-2" id="btnSimpanGuru">Simpan Data</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Penentu Environment API URL
+        let API_URL = "";
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            API_URL = "http://localhost:8888/.netlify/functions/admin"; 
+        } else {
+            API_URL = window.location.origin + "/.netlify/functions/admin";
+        }
+
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                const userData = JSON.parse(sesi);
+                const allowedAdmins = ["198909182020121005", "198709082019031002", "198801112019031004"];
+                
+                if (!allowedAdmins.includes(userData.Username)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Akses Ditolak!',
+                        text: 'Anda tidak memiliki otorisasi untuk membuka Halaman Administrator.',
+                        confirmButtonText: 'Kembali ke Dashboard',
+                        confirmButtonColor: '#198754',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        window.location.href = "index.html";
+                    });
+                    return; 
+                }
+
+                document.getElementById("bodyAdmin").classList.remove("d-none");
+                document.getElementById('namaUser').innerText = userData.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=212529&color=fff&bold=true`;
+                
+                // Muat tabel guru
+                loadDataGuru();
+            }
+        });
+
+        // 1. Fungsi Mengambil Data Guru
+        let allGuruData = [];
+
+        // 1. Fungsi Mengambil Data Guru
+        function loadDataGuru() {
+            fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "read_semua_guru" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById("tabelDataGuru");
+                tbody.innerHTML = "";
+
+                if (data.status === "success" && data.data.length > 0) {
+                    // Saring hanya role Guru dan simpan ke variabel global
+                    allGuruData = data.data.filter(guru => guru.Role === "Guru");
+                    
+                    // Tampilkan ke tabel
+                    renderTabelGuru(allGuruData);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Data guru kosong atau belum ada data.</td></tr>`;
+                }
+            })
+            .catch(error => {
+                const tbody = document.getElementById("tabelDataGuru");
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Gagal terhubung ke server!</td></tr>`;
+                console.error("Error memuat tabel guru:", error);
+            });
+        }
+
+        // Fungsi khusus untuk menggambar tabel
+        function renderTabelGuru(dataArray) {
+            const tbody = document.getElementById("tabelDataGuru");
+            tbody.innerHTML = "";
+
+            if (dataArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ditemukan data yang cocok dengan pencarian Anda.</td></tr>`;
+                return;
+            }
+
+            dataArray.forEach(guru => {
+                const isAktif = (guru.Aktif === 1 || String(guru.Aktif).toLowerCase() === "ya" || String(guru.Aktif).toLowerCase() === "true");
+                
+                const badgeStatus = isAktif 
+                    ? `<span class="badge bg-success">Aktif</span>` 
+                    : `<span class="badge bg-danger">Non-Aktif</span>`;
+                    
+                const btnUbahStatus = isAktif
+                    ? `<button class="btn btn-sm btn-outline-danger fw-bold" onclick="ubahStatus('${guru.Username}', 0)"><i class="fa-solid fa-ban"></i> Matikan</button>`
+                    : `<button class="btn btn-sm btn-outline-success fw-bold" onclick="ubahStatus('${guru.Username}', 1)"><i class="fa-solid fa-check"></i> Aktifkan</button>`;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="ps-4 fw-bold">${guru.Nama_Lengkap}</td>
+                    <td>${guru.Username}</td>
+                    <td><span class="badge bg-secondary">${guru.Role}</span></td>
+                    <td>${guru["Nama Sekolah"]}</td>
+                    <td class="text-center">${badgeStatus}</td>
+                    <td class="text-center pe-4">${btnUbahStatus}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Fitur Pencarian Real-time
+        document.getElementById("inputPencarian").addEventListener("keyup", function(e) {
+            const keyword = e.target.value.toLowerCase();
+            
+            // Saring array allGuruData berdasarkan keyword
+            const filteredData = allGuruData.filter(guru => {
+                const nama = guru.Nama_Lengkap ? guru.Nama_Lengkap.toLowerCase() : "";
+                const nip = guru.Username ? guru.Username.toString().toLowerCase() : "";
+                const sekolah = guru["Nama Sekolah"] ? guru["Nama Sekolah"].toLowerCase() : "";
+                
+                // Kembalikan true jika keyword ada di salah satu dari ketiga kolom tersebut
+                return nama.includes(keyword) || nip.includes(keyword) || sekolah.includes(keyword);
+            });
+            
+            // Gambar ulang tabel dengan data yang sudah disaring
+            renderTabelGuru(filteredData);
+        });
+
+        // 2. Fungsi Ubah Status Aktif/Non-Aktif
+        function ubahStatus(username, statusBaru) {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: "Apakah Anda yakin ingin mengubah status guru ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Ubah!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    
+                    fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "toggle_aktif_guru", username: username, status_baru: statusBaru })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            Swal.fire('Berhasil!', data.message, 'success');
+                            loadDataGuru();
+                        } else {
+                            Swal.fire('Gagal', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Kesalahan jaringan.', 'error');
+                    });
+                }
+            });
+        }
+
+        // 3. Fungsi Tambah Guru (Form Submit)
+        document.getElementById("formTambahGuru").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const btnSimpan = document.getElementById("btnSimpanGuru");
+            btnSimpan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btnSimpan.disabled = true;
+
+            const payload = {
+                action: "tambah_guru",
+                data: {
+                    nama_lengkap: document.getElementById("inputNama").value,
+                    username: document.getElementById("inputNip").value,
+                    password: document.getElementById("inputPassword").value,
+                    nama_sekolah: document.getElementById("inputSekolah").value,
+                    kepala_sekolah: "-", 
+                    nip_kepsek: "-",
+                    pengawas: "-",
+                    nip_pengawas: "-"
+                }
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                btnSimpan.innerHTML = 'Simpan Data';
+                btnSimpan.disabled = false;
+
+                if (data.status === "success") {
+                    Swal.fire('Berhasil!', data.message, 'success');
+                    document.getElementById("formTambahGuru").reset();
+                    bootstrap.Modal.getInstance(document.getElementById('modalTambahGuru')).hide();
+                    loadDataGuru();
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                btnSimpan.innerHTML = 'Simpan Data';
+                btnSimpan.disabled = false;
+                Swal.fire('Error', 'Kesalahan jaringan.', 'error');
+            });
+        });
+    </script>
+</body>
+</html>
