@@ -221,10 +221,10 @@
 
                 const container = document.getElementById("containerKelas");
                 
-                // Saring kelas yang hanya menjadi hak milik guru tersebut
-                const kelasDitampilkan = masterKelas.filter(k => 
-                    daftarKelasGuruRaw === "" || arrayKelasGuru.includes(k.id_kelas) || arrayKelasGuru.includes(k.nama_kelas)
-                );
+                const kelasDitampilkan = masterKelas.filter(k => {
+                    // Cek apakah nip_guru di data kelas sama dengan NIP guru yang login (userData.Username)
+                    return String(k.nip_guru).trim() === String(userData.Username).trim();
+                });
 
                 if (kelasDitampilkan.length === 0) {
                     container.innerHTML = '<div class="col-12"><div class="alert alert-warning">Tidak ada kelas yang ditugaskan untuk Anda.</div></div>';

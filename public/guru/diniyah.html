@@ -196,22 +196,21 @@
                 }
                 
                 const masterKelas = data.kelas; 
-                const daftarKelasGuruRaw = userData["Daftar Kelas"] || ""; 
-                const arrayKelasGuru = daftarKelasGuruRaw.split(',').map(k => k.trim());
                 const container = document.getElementById("containerKelas");
-                
-                const kelasDitampilkan = masterKelas.filter(k => 
-                    daftarKelasGuruRaw === "" || arrayKelasGuru.includes(k.id_kelas) || arrayKelasGuru.includes(k.nama_kelas)
-                );
+
+                const kelasDitampilkan = masterKelas.filter(k => {
+                    // Cek apakah nip_guru di data kelas sama dengan NIP guru yang login (userData.Username)
+                    return String(k.nip_guru).trim() === String(userData.Username).trim();
+                });
 
                 if (kelasDitampilkan.length === 0) {
-                    container.innerHTML = '<div class="col-12"><div class="alert alert-warning">Tidak ada kelas yang ditugaskan untuk Anda.</div></div>';
+                    container.innerHTML = '<div class="col-12"><div class="alert alert-warning">Tidak ada kelas yang ditugaskan untuk NIP Anda. Silakan hubungi admin.</div></div>';
                 } else {
                     kelasDitampilkan.forEach(kelas => {
                         const cardHTML = `
                             <div class="col-md-3">
-                                <a href="diniyah_detail.html?id_kelas=${kelas.id_kelas}&nama_kelas=${encodeURIComponent(kelas.nama_kelas)}" class="card card-kelas h-100 p-4 text-center border shadow-sm">
-                                    <i class="fa-solid fa-book-open fa-3x text-primary mb-3 mt-2"></i>
+                                <a href="hafalandoa_detail.html?id_kelas=${kelas.id_kelas}&nama_kelas=${encodeURIComponent(kelas.nama_kelas)}" class="card card-kelas h-100 p-4 text-center border shadow-sm">
+                                    <i class="fa-solid fa-hands-praying fa-3x text-info mb-3 mt-2"></i>
                                     <h5 class="fw-bold text-dark">${kelas.nama_kelas}</h5>
                                 </a>
                             </div>
@@ -229,7 +228,6 @@
                 document.getElementById("loading").classList.replace("alert-info", "alert-danger");
             }
         }
-
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
             if (!sesi) { window.location.href = "/"; } else {
