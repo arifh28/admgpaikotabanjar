@@ -290,9 +290,13 @@
                 const result = await response.json();
                 
                 if (result.status === 'sukses') {
+                    // --- PERBAIKAN DI SINI ---
+                    // Gunakan result.file_url sesuai dengan yang dikirimkan oleh GAS
+                    const tautanUnduh = result.file_url; 
+
                     // SIMPAN URL UNDUHAN KE LOCAL STORAGE
                     const cacheKey = `arsip_${jenisDokumen}_${kelas}`;
-                    localStorage.setItem(cacheKey, result.download_url);
+                    localStorage.setItem(cacheKey, tautanUnduh);
 
                     Swal.fire({
                         title: 'Sukses!',
@@ -300,7 +304,7 @@
                         icon: 'success',
                         confirmButtonColor: '#198754'
                     }).then(() => {
-                        window.location.href = result.download_url;
+                        window.location.href = tautanUnduh; // Buka file_url
                         loadDataDokumen(); // Memuat ulang tabel untuk merender badge Hijau
                     });
                 } else {

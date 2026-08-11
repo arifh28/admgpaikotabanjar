@@ -494,7 +494,7 @@
 
             try {
                 // Tembak ke endpoint Google Apps Script
-                const request = await fetch("/.netlify/functions/masterdata", { 
+                const request = await fetch("/.netlify/functions/auth", { 
                     method: "POST", 
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
