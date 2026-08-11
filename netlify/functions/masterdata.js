@@ -1,5 +1,5 @@
 exports.handler = async (event, context) => {
-    // GANTI STRING DI BAWAH DENGAN URL EXEC DARI GAS MASTER DATA YANG BARU ANDA DEPLOY!
+    // PASTIKAN URL EXEC INI ADALAH VERSI TERBARU YANG SUDAH DIDEPLOY DENGAN AKSES "ANYONE"
     const GAS_URL_MASTER = "https://script.google.com/macros/s/AKfycbwNxRVR73lbAQTGlF3qaQD4MYUYkwa5X0pOGdbOmFHZfPqoOKy_RR7AQk63zoKY-Wel/exec"; 
 
     const headers = {
@@ -19,10 +19,13 @@ exports.handler = async (event, context) => {
     try {
         const payload = JSON.parse(event.body);
 
+        // --- PERBAIKAN DI SINI ---
+        // Gunakan text/plain dan wajibkan follow redirect agar GAS menerima datanya
         const response = await fetch(GAS_URL_MASTER, {
             method: 'POST',
             body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            redirect: 'follow' 
         });
 
         const rawText = await response.text();
