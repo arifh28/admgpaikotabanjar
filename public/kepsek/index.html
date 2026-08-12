@@ -215,38 +215,29 @@
                         <p class="text-muted text-break">Ringkasan aktivitas guru dan administrasi sekolah.</p>
                     </div>
                 </div>
-
+                
                 <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-4">
-                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-success h-100">
+                    <!-- Kartu 1 (Ubah jadi col-md-6 agar membagi dua layar) -->
+                    <div class="col-12 col-md-6">
+                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-success h-100 shadow-sm">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-1">Total Guru PAI</h6>
-                                    <h2 class="fw-bold mb-0">12</h2>
+                                    <h2 class="fw-bold mb-0" id="angkaTotalGuru"><i class="fa-solid fa-spinner fa-spin fa-sm text-success"></i></h2>
                                 </div>
                                 <i class="fa-solid fa-users fa-3x text-success opacity-25"></i>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-warning h-100">
+                    <!-- Kartu 2 (Ubah jadi col-md-6) -->
+                    <div class="col-12 col-md-6">
+                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-warning h-100 shadow-sm">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-1">Dokumen Cetak</h6>
-                                    <h2 class="fw-bold mb-0">145</h2>
+                                    <h2 class="fw-bold mb-0" id="angkaTotalDokumen"><i class="fa-solid fa-spinner fa-spin fa-sm text-warning"></i></h2>
                                 </div>
                                 <i class="fa-solid fa-file-signature fa-3x text-warning opacity-25"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card kartu-kustom p-4 border-0 border-start border-4 border-primary h-100">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-1">Input Hari Ini</h6>
-                                    <h2 class="fw-bold mb-0">85%</h2>
-                                </div>
-                                <i class="fa-solid fa-chart-line fa-3x text-primary opacity-25"></i>
                             </div>
                         </div>
                     </div>
@@ -305,9 +296,41 @@
                 
                 const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=ffc107&color=000&bold=true`;
                 document.getElementById('avatarKepsek').src = avatarUrl;
+
+                fetchStatistikKepsek(userData.Username);
+
             }
         });
 
+        // Fungsi penarik data statistik kepsek
+        async function fetchStatistikKepsek(nipKepsek) {
+            try {
+                const request = await fetch("/.netlify/functions/kepsek", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        action: "get_statistik_kepsek", 
+                        nip_kepsek: nipKepsek 
+                    })
+                });
+
+                const response = await request.json();
+
+                if (response.status === "success" || response.status === "sukses") {
+                    document.getElementById('angkaTotalGuru').innerText = response.data.total_guru;
+                    document.getElementById('angkaTotalDokumen').innerText = response.data.total_dokumen;
+                } else {
+                    document.getElementById('angkaTotalGuru').innerText = "-";
+                    document.getElementById('angkaTotalDokumen').innerText = "-";
+                    console.error("Gagal menarik data:", response.message);
+                }
+            } catch (err) {
+                document.getElementById('angkaTotalGuru').innerText = "0";
+                document.getElementById('angkaTotalDokumen').innerText = "0";
+                console.error("Kesalahan jaringan:", err);
+            }
+        }
+        
         // 3. Logika Keluar Aplikasi
         function logout() {
             localStorage.removeItem('user_session');
