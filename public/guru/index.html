@@ -100,6 +100,10 @@
                     <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
                 </a>
 
+				<a href="#" onclick="lompatKePortalSiswa()" class="nav-link-custom bg-primary text-white mt-3" style="border-radius: 8px; margin: 0 15px;">
+					<div class="menu-text"><i class="fa-solid fa-external-link-alt"></i> <span>Media Pembelajaran Siswa</span></div>
+				</a>
+
                 <!-- 2. Menu Master Data (Dropdown) -->
                 <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
@@ -152,6 +156,7 @@
                     <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
                     <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
                     <a href="/guru/jurnal.html" class="nav-link-custom"><i class="fa-solid fa-book-bookmark text-primary"></i> JURNAL</a>
+                    <a href="/guru/bank_soal.html" class="nav-link-custom active"><i class="fa-solid fa-file-lines text-warning"></i> BANK SOAL</a>
                 </div>
                 <!-- 4. Menu Admin (Disembunyikan secara default, diaktifkan via JS) -->
                 <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
@@ -520,6 +525,20 @@
                 btnSubmit.disabled = false;
             }
         });
+		function lompatKePortalSiswa() {
+			const sesi = localStorage.getItem('user_session');
+			const targetUrl = 'https://mediapembelajaranpaikotabanjar.vercel.app/';
+
+			if (sesi) {
+				// Encode (samarkan) data JSON menjadi Base64 agar aman di URL
+				const encodedSession = btoa(encodeURIComponent(sesi));
+				// Lempar ke Vercel dengan membawa token sesi
+				window.location.href = `${targetUrl}?token_sesi=${encodedSession}`;
+			} else {
+				// Jika tidak ada sesi, lempar biasa
+				window.location.href = targetUrl;
+			}
+		}
     </script>
 </body>
 </html>

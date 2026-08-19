@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Program Semester (PROSEM)</title>
+    <title>Generator Bank Soal</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -79,7 +79,7 @@
                 </a>
                 <div class="collapse show submenu" id="menuGenerator">
                     <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
-                    <a href="/guru/prosem.html" class="nav-link-custom active"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
                     <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
                     <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
                     <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
@@ -119,7 +119,7 @@
 
             <main class="content-area">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-file-contract text-success me-2"></i>Program Semester (PROSEM)</h3>
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-file-lines text-warning me-2"></i>Bank Soal</h3>
                 </div>
 
                 <div class="card border-0 shadow-sm mb-4">
@@ -161,7 +161,7 @@
     <script>
         let currentUser = {};
 
-        // 1. Inisialisasi Saat Halaman Dimuat (Sama seperti mastersiswa)
+        // 1. Inisialisasi Saat Halaman Dimuat
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
             if (!sesi) {
@@ -196,7 +196,7 @@
                     body: JSON.stringify({
                         action: 'get_master_dokumen',
                         nip: currentUser.Username,
-                        jenis_dokumen: 'Program Semester' // Ubah untuk prosem, kktp, dll
+                        jenis_dokumen: 'Bank Soal' // <-- UBAH KE BANK SOAL
                     })
                 });
 
@@ -218,7 +218,7 @@
             tbody.innerHTML = "";
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada template Program Semester untuk Anda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada template Bank Soal untuk Anda.</td></tr>`;
                 return;
             }
 
@@ -291,7 +291,6 @@
                 const result = await response.json();
                 
                 if (result.status === 'sukses') {
-                    // --- PERBAIKAN DI SINI ---
                     // Gunakan result.file_url sesuai dengan yang dikirimkan oleh GAS
                     const tautanUnduh = result.file_url; 
 
