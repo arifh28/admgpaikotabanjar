@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilih Kelas - Infaq & Shodaqoh</title>
+    <title>Edit Profil - Panel Guru</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         body { background-color: #f4f6f9; overflow-x: hidden; }
         .wrapper { display: flex; width: 100%; min-height: 100vh; }
@@ -23,6 +26,7 @@
         .content-area { padding: 30px; flex-grow: 1; }
         .card-kelas { transition: transform 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
         .card-kelas:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-color: #198754 !important;}
+        .bg-readonly { background-color: #e9ecef !important; cursor: not-allowed; }
         /* Modifikasi untuk Dropdown Sidebar */
         .nav-link-custom {
             display: flex;
@@ -60,7 +64,8 @@
     </style>
 </head>
 <body>
-    <div class="wrapper" id="main-dashboard">
+    <div class="wrapper">
+        <!-- Sidebar -->
         <nav class="sidebar shadow-lg">
             <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
             <div class="sidebar-menu">
@@ -133,119 +138,166 @@
             </div>
         </nav>
 
+        <!-- MAIN PANEL -->
         <div class="main-panel">
             <header class="top-header">
-    <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
-    <div class="user-profile dropdown">
-        <div class="text-end">
-            <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
-            <small class="text-muted" id="nipUser">NIP: -</small>
-        </div>
-        
-        <!-- Pemicu Dropdown -->
-        <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
-        </a>
-        
-        <!-- Isi Menu Dropdown -->
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-            <li><a class="dropdown-item py-2" href="edit_profil.html"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Profil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
-        </ul>
-    </div>
-</header>
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUserHeader">Guru</div>
+                        <small class="text-muted" id="nipUserHeader">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                </div>
+            </header>
 
             <main class="content-area">
-                <a href="pembiasaan.html" class="btn btn-outline-secondary mb-3"><i class="fa-solid fa-arrow-left me-2"></i>Kembali ke Menu</a>
-                <h3 class="mb-4 fw-bold">Pilih Kelas - Infaq / Shodaqoh</h3>
-                
-                <div id="loading" class="alert alert-info border-0 shadow-sm border-start border-4 border-info">
-                    <i class="fa-solid fa-spinner fa-spin me-2"></i> Memuat daftar kelas Anda...
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-user-pen text-success me-2"></i>Edit Profil</h3>
                 </div>
 
-                <div class="row g-4 d-none" id="containerKelas"></div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm border-top border-4 border-success">
+                            <div class="card-body p-4">
+                                <form id="formEditProfil">
+                                    
+                                    <h5 class="fw-bold mb-3 border-bottom pb-2">Informasi Pribadi & Sekolah</h5>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nama Lengkap (Beserta Gelar)</label>
+                                        <input type="text" class="form-control" id="inpNama" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">Nama Sekolah Tugas</label>
+                                        <input type="text" class="form-control" id="inpSekolah" required>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">Nama Kepala Sekolah</label>
+                                            <input type="text" class="form-control" id="inpKepsek" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">NIP Kepala Sekolah</label>
+                                            <input type="text" class="form-control" id="inpNipKepsek" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">Nama Pengawas PAI</label>
+                                            <input type="text" class="form-control bg-readonly" id="inpPengawas" readonly>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">NIP Pengawas PAI</label>
+                                            <input type="text" class="form-control bg-readonly" id="inpNipPengawas" readonly>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Peringatan Admin -->
+                                    <div class="alert alert-warning border-0 shadow-sm mt-2 mb-4 d-flex align-items-center">
+                                        <i class="fa-solid fa-circle-info fa-lg me-3 text-warning"></i>
+                                        <small class="mb-0 fw-bold text-dark">
+                                            Data Pengawas dan NIP Pengawas hanya dapat diperbaharui oleh Administrator Tingkat Kota.
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-success fw-bold px-4" id="btnSimpan">
+                                            <i class="fa-solid fa-floppy-disk me-2"></i>Simpan Perubahan
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
-        async function muatDaftarKelas(userData) {
-            try {
-                const cacheKey = `data_pembiasaan_${userData.Username}`;
-                let data;
-                const cachedData = sessionStorage.getItem(cacheKey);
-
-                if (cachedData) {
-                    data = JSON.parse(cachedData);
-                } else {
-                    const request = await fetch("/.netlify/functions/pembiasaan", { 
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ action: "get_pembiasaan" })
-                    });
-                    const hasil = await request.json();
-                    if (hasil.status === "sukses") {
-                        data = hasil.data; 
-                        sessionStorage.setItem(cacheKey, JSON.stringify(data));
-                    } else {
-                        alert("Gagal mengambil data server.");
-                        return;
-                    }
-                }
-                
-                const masterKelas = data.kelas; 
-                const daftarKelasGuruRaw = userData["Daftar Kelas"] || ""; 
-                const arrayKelasGuru = daftarKelasGuruRaw.split(',').map(k => k.trim());
-                const container = document.getElementById("containerKelas");
-                
-                const kelasDitampilkan = masterKelas.filter(k => {
-                    // Cek apakah nip_guru di data kelas sama dengan NIP guru yang login (userData.Username)
-                    return String(k.nip_guru).trim() === String(userData.Username).trim();
-                });
-
-                if (kelasDitampilkan.length === 0) {
-                    container.innerHTML = '<div class="col-12"><div class="alert alert-warning">Tidak ada kelas yang ditugaskan untuk Anda.</div></div>';
-                } else {
-                    kelasDitampilkan.forEach(kelas => {
-                        const cardHTML = `
-                            <div class="col-md-3">
-                                <a href="infaq_detail.html?id_kelas=${kelas.id_kelas}&nama_kelas=${encodeURIComponent(kelas.nama_kelas)}" class="card card-kelas h-100 p-4 text-center border shadow-sm">
-                                    <i class="fa-solid fa-hand-holding-dollar fa-3x text-primary mb-3 mt-2"></i>
-                                    <h5 class="fw-bold text-dark">${kelas.nama_kelas}</h5>
-                                </a>
-                            </div>
-                        `;
-                        container.innerHTML += cardHTML;
-                    });
-                }
-
-                document.getElementById("loading").classList.add("d-none");
-                container.classList.remove("d-none");
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById("loading").innerHTML = `<i class="fa-solid fa-circle-exclamation me-2"></i> Gagal memuat: ${err.message}`;
-                document.getElementById("loading").classList.replace("alert-info", "alert-danger");
-            }
-        }
+        let currentUser = {};
 
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
-            if (!sesi) { window.location.href = "/"; } else {
-                const userData = JSON.parse(sesi);
-                document.getElementById('namaUser').innerText = userData.Nama_Lengkap;
-                document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
-                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
-                muatDaftarKelas(userData);
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                currentUser = JSON.parse(sesi);
+                
+                // Header Profil
+                document.getElementById('namaUserHeader').innerText = currentUser.Nama_Lengkap;
+                document.getElementById('nipUserHeader').innerText = "NIP: " + (currentUser.Username || "-");
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+
+                // Prapengisian (Pre-fill) Form
+                document.getElementById('inpNama').value = currentUser.Nama_Lengkap || "";
+                document.getElementById('inpSekolah').value = currentUser["Nama Sekolah"] || "";
+                document.getElementById('inpKepsek').value = currentUser["Kepala Sekolah"] || "";
+                document.getElementById('inpNipKepsek').value = currentUser["NIP Kepala Sekolah"] || "";
+                document.getElementById('inpPengawas').value = currentUser.Pengawas || "-";
+                document.getElementById('inpNipPengawas').value = currentUser["NIP Pengawas"] || "-";
             }
         });
-        function logout() {
-            localStorage.removeItem('user_session');
-            window.location.href = "/";
-        }
+
+        document.getElementById('formEditProfil').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnSimpan');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Menyimpan...';
+            btn.disabled = true;
+
+            const payload = {
+                action: 'edit_profil',
+                nip: currentUser.Username,
+                nama_lengkap: document.getElementById('inpNama').value,
+                nama_sekolah: document.getElementById('inpSekolah').value,
+                kepala_sekolah: document.getElementById('inpKepsek').value,
+                nip_kepsek: document.getElementById('inpNipKepsek').value
+            };
+
+            try {
+                // Tembak ke endpoint Netlify auth/masterdata Anda
+                const response = await fetch("/.netlify/functions/auth", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success' || result.status === 'sukses') {
+                    // Update sesi lokal agar perubahan langsung terlihat tanpa login ulang
+                    currentUser.Nama_Lengkap = result.data.Nama_Lengkap;
+                    currentUser["Nama Sekolah"] = result.data["Nama Sekolah"];
+                    currentUser["Kepala Sekolah"] = result.data["Kepala Sekolah"];
+                    currentUser["NIP Kepala Sekolah"] = result.data["NIP Kepala Sekolah"];
+                    
+                    localStorage.setItem('user_session', JSON.stringify(currentUser));
+
+                    Swal.fire('Berhasil!', 'Profil Anda telah diperbarui.', 'success').then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Gagal', result.message || 'Terjadi kesalahan.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Kesalahan jaringan atau server gagal merespons.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>
