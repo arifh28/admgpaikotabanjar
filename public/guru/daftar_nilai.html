@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Nilai - Panel Guru</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { background-color: #f4f6f9; overflow-x: hidden; }
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #198754 0%, #146c43 100%); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1040; top: 0; left: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .sidebar-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-link-custom { color: rgba(255, 255, 255, 0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .nav-link-custom:hover, .nav-link-custom.active { color: white; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc107; }
+        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
+        .main-panel { width: calc(100% - 260px); margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .top-header { background-color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; z-index: 1020; position: sticky; top: 0; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar-img, .card, .btn, .dropdown-menu { border-radius: 0 !important; }
+        .avatar-img { width: 40px; height: 40px; object-fit: cover; border: 2px solid #198754; }
+        .content-area { padding: 30px; flex-grow: 1; }
+        
+        .nav-link-custom { display: flex; align-items: center; justify-content: flex-start; }
+        .nav-link-custom .menu-text { display: flex; align-items: center; flex-grow: 1; }
+        .collapse-icon { transition: transform 0.3s ease; font-size: 0.8rem; opacity: 0.7; }
+        .nav-link-custom[aria-expanded="true"] .collapse-icon { transform: rotate(180deg); }
+        .submenu { background-color: rgba(0, 0, 0, 0.15); }
+        .submenu .nav-link-custom { padding-left: 55px; font-size: 0.95rem; padding-top: 10px; padding-bottom: 10px; }
+        .submenu .nav-link-custom i { width: 25px; font-size: 1rem; }
+
+        /* Styling Tabel Excel-like */
+        .table-nilai th, .table-nilai td {
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+        .table-nilai thead th { background-color: #198754; color: white; padding: 15px; }
+        .select-kelas-wrapper { max-width: 350px; }
+        .col-sticky { position: sticky; left: 0; background-color: #fff; z-index: 1; border-right: 2px solid #dee2e6; }
+        .thead-sticky { z-index: 2 !important; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar shadow-lg">
+            <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
+            <div class="sidebar-menu">
+                <a href="/guru/index.html" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
+                </a>
+
+                <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuMaster">
+                    <a href="/guru/masterkelas.html" class="nav-link-custom"><i class="fa-solid fa-chalkboard text-primary"></i> Data Kelas</a>
+                    <a href="/guru/mastersiswa.html" class="nav-link-custom"><i class="fa-solid fa-user-graduate text-info"></i> Data Siswa</a>
+                </div>
+
+                <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuPembiasaan">
+                    <a href="/guru/sholatfardlu.html" class="nav-link-custom"><i class="fa-solid fa-mosque text-primary"></i> Sholat Fardlu</a>
+                    <a href="/guru/sholatsunat.html" class="nav-link-custom"><i class="fa-solid fa-hands-praying text-success"></i> Sholat Sunat</a>
+                    <a href="/guru/infaq.html" class="nav-link-custom"><i class="fa-solid fa-hand-holding-dollar text-warning"></i> Infaq / Sodaqoh</a>
+                    <a href="/guru/diniyah.html" class="nav-link-custom"><i class="fa-solid fa-school text-danger"></i> Diniyah</a>
+                    <a href="/guru/hafalandoa.html" class="nav-link-custom"><i class="fa-solid fa-book-open text-info"></i> Hafalan Doa</a>
+                    <a href="/guru/juzamma.html" class="nav-link-custom"><i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma</a>
+                </div>
+                
+                <a href="#menuDataGuru" data-bs-toggle="collapse" aria-expanded="true" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-folder-open"></i> <span>Administrasi</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse show submenu" id="menuDataGuru">
+                    <a href="/guru/jadwal.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> JADWAL PELAJARAN</a>
+                    <a href="/guru/daftar_hadir.html" class="nav-link-custom"><i class="fa-solid fa-user-check text-info"></i> DAFTAR HADIR</a>
+                    <a href="/guru/daftar_nilai.html" class="nav-link-custom active"><i class="fa-solid fa-star text-success"></i> DAFTAR NILAI</a>
+                    <a href="/guru/analisis_hasil_ulangan.html" class="nav-link-custom"><i class="fa-solid fa-chart-pie text-primary"></i> ANALISIS HASIL ULANGAN</a>
+                    <a href="/guru/remidial.html" class="nav-link-custom"><i class="fa-solid fa-arrow-up-right-dots text-danger"></i> REMIDIAL & PENGAYAAN</a>
+                    <a href="/guru/bimbingan_konseling.html" class="nav-link-custom"><i class="fa-solid fa-handshake-angle text-secondary"></i> BIMBINGAN KONSELING</a>
+                    <a href="/guru/inventaris.html" class="nav-link-custom"><i class="fa-solid fa-boxes-stacked text-primary"></i> INVENTARIS KELAS</a>
+                    <a href="/guru/notula_rapat.html" class="nav-link-custom"><i class="fa-solid fa-users-rectangle text-warning"></i> NOTULA RAPAT</a>
+                </div>
+            </div>
+            <div class="p-3 text-center">
+                <p class="small opacity-50 mb-0" id="namaSekolahTeks">Memuat sekolah...</p>
+            </div>
+        </nav>
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+            <header class="top-header">
+                <div><h5 class="mb-0 fw-bold text-dark">Sistem Informasi Administrasi Guru</h5></div>
+                <div class="user-profile dropdown">
+                    <div class="text-end">
+                        <div class="fw-bold text-dark mb-0 lh-1" id="namaUser">Guru</div>
+                        <small class="text-muted" id="nipUser">NIP: -</small>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" id="avatarUser" class="avatar-img shadow-sm" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li><a class="dropdown-item py-2" href="edit_profil.html"><i class="fa-solid fa-user-gear me-2"></i>Pengaturan Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item py-2 text-danger fw-bold" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar Aplikasi</button></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-star text-success me-2"></i>Daftar Nilai Siswa</h3>
+                    <button class="btn btn-outline-success fw-bold border-2 d-none" id="btnExport" onclick="exportToExcel()">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white pt-4 pb-3 border-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-filter me-2 text-muted"></i>Saring Kelas</h5>
+                        </div>
+                        <div class="select-kelas-wrapper w-100">
+                            <select id="selectKelas" class="form-select form-select-lg shadow-sm border-success">
+                                <option value="" disabled selected>-- Memuat Kelas... --</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-0" id="areaTabel">
+                        <div class="table-responsive p-4 pt-0" style="max-height: 70vh; overflow-y: auto;">
+                            <table class="table table-nilai table-striped table-hover mb-0 w-100" id="tableNilai">
+                                <thead id="theadNilai" style="position: sticky; top: 0; z-index: 10;">
+                                    <tr>
+                                        <th class="text-center py-4 rounded-top">Silakan pilih kelas pada kotak di atas.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyNilai">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let currentUser = {};
+        let globalData = { kelas: [], siswa: [], nilai: [] };
+
+        // 1. Inisialisasi Saat Halaman Dimuat
+        document.addEventListener("DOMContentLoaded", function() {
+            const sesi = localStorage.getItem('user_session');
+            if (!sesi) {
+                window.location.href = "/";
+            } else {
+                currentUser = JSON.parse(sesi);
+                
+                document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
+                document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
+                document.getElementById('namaSekolahTeks').innerText = currentUser["Nama Sekolah"] || "-";
+                document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+                
+                loadDataNilai();
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('user_session');
+            window.location.href = "/";
+        }
+
+        // 2. Mengambil Semua Data Terkait dari Server
+        async function loadDataNilai() {
+            const select = document.getElementById('selectKelas');
+            try {
+                // Pastikan endpoint ini mengarah ke file Netlify data-guru Anda
+                const response = await fetch("/.netlify/functions/data-guru", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: 'get_nilai',
+                        nip: currentUser.Username 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'sukses' || result.status === 'success') {
+                    globalData = result;
+                    populateDropdownKelas(result.kelas);
+                } else {
+                    select.innerHTML = `<option disabled selected>Error: ${result.message}</option>`;
+                }
+            } catch (error) {
+                select.innerHTML = `<option disabled selected>Error Jaringan/Server Sibuk</option>`;
+            }
+        }
+
+        // 3. Masukkan Daftar Kelas ke Dropdown
+        function populateDropdownKelas(kelasArr) {
+            const select = document.getElementById('selectKelas');
+            select.innerHTML = '<option value="" disabled selected>-- Pilih Kelas Anda --</option>';
+            
+            if(kelasArr.length === 0) {
+                select.innerHTML = '<option value="" disabled selected>Belum ada kelas yang terdaftar</option>';
+                return;
+            }
+
+            kelasArr.forEach(k => {
+                select.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
+            });
+
+            select.addEventListener('change', function(e) {
+                document.getElementById('btnExport').classList.remove('d-none');
+                renderMatrixNilai(e.target.value);
+            });
+        }
+
+        // 4. Merender Matriks (Grid) Nilai
+        function renderMatrixNilai(kelasId) {
+            const tbody = document.getElementById('tbodyNilai');
+            const thead = document.getElementById('theadNilai');
+            
+            const siswaKelas = globalData.siswa.filter(s => s.id_kelas === kelasId);
+            const nilaiKelas = globalData.nilai.filter(n => n.id_kelas === kelasId);
+
+            if (siswaKelas.length === 0) {
+                thead.innerHTML = '';
+                tbody.innerHTML = `<tr><td class="text-center text-muted py-5"><i class="fa-solid fa-folder-open fa-3x mb-3 opacity-25 d-block"></i>Belum ada data siswa di kelas ini.</td></tr>`;
+                return;
+            }
+
+            // Ambil daftar materi/topik unik untuk dijadikan Tajuk Kolom Header (Dinamic Columns)
+            // Misalnya: "Formatif - Alquran Hadis"
+            const materiSet = new Set();
+            nilaiKelas.forEach(n => materiSet.add(n.materi));
+            const listMateri = Array.from(materiSet); 
+
+            // Buat HTML Header
+            let thHTML = `<tr>
+                <th class="text-center align-middle">No.</th>
+                <th class="align-middle thead-sticky col-sticky">Nama Siswa</th>`;
+            
+            listMateri.forEach(materi => {
+                thHTML += `<th class="text-center align-middle">${materi}</th>`;
+            });
+            thHTML += `</tr>`;
+            thead.innerHTML = thHTML;
+
+            // Buat HTML Body (Daftar Siswa & Nilai)
+            tbody.innerHTML = '';
+            siswaKelas.forEach((siswa, index) => {
+                let tr = document.createElement('tr');
+                
+                // Kolom No
+                let tdNo = document.createElement('td');
+                tdNo.className = 'text-center fw-bold text-muted';
+                tdNo.innerText = index + 1;
+                tr.appendChild(tdNo);
+                
+                // Kolom Nama (Sticky)
+                let tdNama = document.createElement('td');
+                tdNama.className = 'fw-bold text-dark col-sticky';
+                tdNama.innerText = siswa.nama_siswa;
+                tr.appendChild(tdNama);
+
+                // Kolom-kolom Nilai Dinamis
+                listMateri.forEach(materi => {
+                    let tdNilai = document.createElement('td');
+                    tdNilai.className = 'text-center align-middle h6 mb-0';
+                    
+                    let objNilai = nilaiKelas.find(n => n.id_siswa === siswa.id_siswa && n.materi === materi);
+                    
+                    if (objNilai && objNilai.nilai !== "" && objNilai.nilai !== undefined) {
+                        tdNilai.innerText = objNilai.nilai;
+                        if(parseInt(objNilai.nilai) < 75) {
+                             tdNilai.classList.add('text-danger');
+                        } else {
+                             tdNilai.classList.add('text-success');
+                        }
+                    } else {
+                        tdNilai.innerHTML = '<span class="text-muted opacity-25">-</span>';
+                    }
+                    tr.appendChild(tdNilai);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 5. Ekspor Tabel HTML ke Format Excel (.xls)
+        function exportToExcel() {
+            let select = document.getElementById('selectKelas');
+            let namaKelas = select.options[select.selectedIndex].text.replace(/\s+/g, '_');
+            let namaGuru = currentUser.Nama_Lengkap.replace(/\s+/g, '_');
+
+            let tableHtml = document.getElementById("tableNilai").outerHTML;
+            let htmlTemplate = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Nilai ${namaKelas}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                </head>
+                <body>
+                    ${tableHtml}
+                </body>
+                </html>
+            `;
+            let blob = new Blob([htmlTemplate], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `Daftar_Nilai_${namaKelas}_${namaGuru}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

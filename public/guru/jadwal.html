@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- UBAH BAGIAN INI UNTUK FAIL LAIN -->
     <title>Jadwal Pelajaran - Panel Guru</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,6 +31,17 @@
         .submenu { background-color: rgba(0, 0, 0, 0.15); }
         .submenu .nav-link-custom { padding-left: 55px; font-size: 0.95rem; padding-top: 10px; padding-bottom: 10px; }
         .submenu .nav-link-custom i { width: 25px; font-size: 1rem; }
+
+        /* Styling Tabel Excel-like */
+        .table-jadwal th, .table-jadwal td {
+            vertical-align: middle;
+            text-align: center;
+            white-space: nowrap;
+            border: 1px solid #dee2e6;
+        }
+        .table-jadwal thead th { background-color: #6f42c1; color: white; padding: 15px; }
+        .istirahat-row { background-color: #ffc107 !important; color: black; font-weight: bold; letter-spacing: 1px; }
+        .jp-col { font-weight: bold; background-color: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -41,12 +51,10 @@
             <div class="sidebar-header"><i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i><h5 class="fw-bold mb-0">Panel Guru</h5></div>
             <div class="sidebar-menu">
                 
-                <!-- 1. Dashboard -->
                 <a href="/guru/index.html" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
                 </a>
 
-                <!-- 2. Data Master -->
                 <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
@@ -56,7 +64,6 @@
                     <a href="/guru/mastersiswa.html" class="nav-link-custom"><i class="fa-solid fa-user-graduate text-info"></i> Data Siswa</a>
                 </div>
 
-                <!-- 3. Pembiasaan -->
                 <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
@@ -70,13 +77,11 @@
                     <a href="/guru/juzamma.html" class="nav-link-custom"><i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma</a>
                 </div>
                 
-                <!-- 4. Administrasi / Data Guru (Aktif) -->
                 <a href="#menuDataGuru" data-bs-toggle="collapse" aria-expanded="true" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-folder-open"></i> <span>Administrasi</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
                 </a>
                 <div class="collapse show submenu" id="menuDataGuru">
-                    <!-- PINDAHKAN CLASS 'active' PADA MENU YANG SESUAI UNTUK FAIL LAIN -->
                     <a href="/guru/jadwal.html" class="nav-link-custom active"><i class="fa-solid fa-calendar-days text-warning"></i> JADWAL PELAJARAN</a>
                     <a href="/guru/daftar_hadir.html" class="nav-link-custom"><i class="fa-solid fa-user-check text-info"></i> DAFTAR HADIR</a>
                     <a href="/guru/daftar_nilai.html" class="nav-link-custom"><i class="fa-solid fa-star text-success"></i> DAFTAR NILAI</a>
@@ -86,10 +91,6 @@
                     <a href="/guru/inventaris.html" class="nav-link-custom"><i class="fa-solid fa-boxes-stacked text-primary"></i> INVENTARIS KELAS</a>
                     <a href="/guru/notula_rapat.html" class="nav-link-custom"><i class="fa-solid fa-users-rectangle text-warning"></i> NOTULA RAPAT</a>
                 </div>
-                
-                <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
-                    <div class="menu-text"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
-                </a>
             </div>
             <div class="p-3 text-center">
                 <p class="small opacity-50 mb-0" id="namaSekolahTeks">Memuat sekolah...</p>
@@ -117,17 +118,38 @@
             </header>
 
             <main class="content-area">
-                <!-- UBAH JUDUL ICON & TEKS INI UNTUK FAIL LAIN -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="fw-bold mb-0" id="h3Title"><i class="fa-solid fa-calendar-days text-warning me-2"></i>Jadwal Pelajaran</h3>
+                    <button class="btn btn-outline-success fw-bold border-2" onclick="exportToExcel()">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
                 </div>
 
                 <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body text-center py-5">
-                        <i class="fa-solid fa-person-digging fa-4x text-warning mb-3 mt-3"></i>
-                        <h4 class="fw-bold text-dark">Sedang Dalam Tahap Pengembangan</h4>
-                        <p class="text-muted fs-6 mb-4">Fitur ini masih dalam proses pengerjaan dan akan segera hadir pada pembaruan berikutnya.</p>
-                        <a href="/guru/index.html" class="btn btn-success fw-bold px-4 mb-3"><i class="fa-solid fa-house me-2"></i>Kembali ke Dashboard</a>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-jadwal table-striped table-hover mb-0 w-100" id="tableJadwal">
+                                <thead>
+                                    <tr>
+                                        <th width="15%">Waktu / JP</th>
+                                        <th width="14%">Senin</th>
+                                        <th width="14%">Selasa</th>
+                                        <th width="14%">Rabu</th>
+                                        <th width="14%">Kamis</th>
+                                        <th width="14%">Jumat</th>
+                                        <th width="14%">Sabtu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyJadwal">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5">
+                                            <i class="fa-solid fa-spinner fa-spin fa-2x text-warning mb-2"></i>
+                                            <p class="mb-0 text-muted">Menarik matriks jadwal dari server...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -140,7 +162,26 @@
     <script>
         let currentUser = {};
 
-        // Inisialisasi Saat Halaman Dimuat
+        // Struktur Slot Jam Pelajaran
+        const templateSlot = [
+            { jamKe: 1, mulai: "06:31", selesai: "07:05", isIstirahat: false },
+            { jamKe: 2, mulai: "07:06", selesai: "07:40", isIstirahat: false },
+            { jamKe: 3, mulai: "07:41", selesai: "08:15", isIstirahat: false },
+            { jamKe: 4, mulai: "08:16", selesai: "08:50", isIstirahat: false },
+            { jamKe: 5, mulai: "08:51", selesai: "09:25", isIstirahat: false },
+            { jamKe: 0, mulai: "09:26", selesai: "09:55", isIstirahat: true, namaIstirahat: "Istirahat Pertama (MBG)" },
+            { jamKe: 6, mulai: "09:56", selesai: "10:30", isIstirahat: false },
+            { jamKe: 7, mulai: "10:31", selesai: "11:05", isIstirahat: false },
+            { jamKe: 8, mulai: "11:06", selesai: "11:40", isIstirahat: false },
+            { jamKe: 0, mulai: "11:40", selesai: "12:30", isIstirahat: true, namaIstirahat: "Istirahat Kedua (Sholat Dhuhur)" },
+            { jamKe: 9, mulai: "12:31", selesai: "13:05", isIstirahat: false },
+            { jamKe: 10, mulai: "13:06", selesai: "13:40", isIstirahat: false },
+            { jamKe: 11, mulai: "13:41", selesai: "14:15", isIstirahat: false }
+        ];
+
+        const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+        // 1. Inisialisasi Saat Halaman Dimuat
         document.addEventListener("DOMContentLoaded", function() {
             const sesi = localStorage.getItem('user_session');
             if (!sesi) {
@@ -148,18 +189,114 @@
             } else {
                 currentUser = JSON.parse(sesi);
                 
-                // Render Profil di Top Header
                 document.getElementById('namaUser').innerText = currentUser.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (currentUser.Username || "-");
                 document.getElementById('namaSekolahTeks').innerText = currentUser["Nama Sekolah"] || "-";
                 document.getElementById('avatarUser').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.Nama_Lengkap)}&background=198754&color=fff&bold=true`;
+                
+                loadDataJadwal();
             }
         });
 
-        // Logout Function
         function logout() {
             localStorage.removeItem('user_session');
             window.location.href = "/";
+        }
+
+        // 2. Mengambil Data Dari Server
+        // 2. Mengambil Data Dari Server
+        async function loadDataJadwal() {
+            const tbody = document.getElementById('tbodyJadwal');
+            try {
+                // PERUBAHAN: Ubah target fungsi menjadi data-guru
+                const response = await fetch("/.netlify/functions/data-guru", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: 'get_jadwal',
+                        nip: currentUser.Username 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'sukses' || result.status === 'success') {
+                    renderMatrixJadwal(result.data);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Terjadi kesalahan jaringan/koneksi server.</td></tr>`;
+            }
+        }
+
+        // 3. Merender Matriks (Grid) Jadwal
+        function renderMatrixJadwal(dataJadwal) {
+            const tbody = document.getElementById('tbodyJadwal');
+            tbody.innerHTML = "";
+
+            templateSlot.forEach(slot => {
+                const tr = document.createElement('tr');
+
+                // Kolom Kiri: Jam Pelajaran & Rentang Waktu
+                const tdJam = document.createElement('td');
+                tdJam.className = 'jp-col';
+                if (slot.isIstirahat) {
+                    tdJam.innerHTML = `${slot.mulai} - ${slot.selesai}`;
+                } else {
+                    tdJam.innerHTML = `JP ${slot.jamKe}<br><small class="text-muted fw-normal">${slot.mulai} - ${slot.selesai}</small>`;
+                }
+                tr.appendChild(tdJam);
+
+                // Kolom Kanan: Jadwal berdasarkan Hari
+                if (slot.isIstirahat) {
+                    const tdIstirahat = document.createElement('td');
+                    tdIstirahat.colSpan = hariList.length; // Menggabungkan 6 kolom hari
+                    tdIstirahat.className = 'istirahat-row';
+                    tdIstirahat.innerText = slot.namaIstirahat.toUpperCase();
+                    tr.appendChild(tdIstirahat);
+                } else {
+                    hariList.forEach(hari => {
+                        const tdHari = document.createElement('td');
+                        
+                        // Cari jadwal spesifik di hari dan jam ini (parse ke Integer agar tipe datanya sama)
+                        const jadwalDitemukan = dataJadwal.find(j => j.hari === hari && parseInt(j.jam_ke) === slot.jamKe);
+                        
+                        if (jadwalDitemukan) {
+                            tdHari.innerHTML = `<span class="text-primary fw-bold">${jadwalDitemukan.nama_kelas}</span>`;
+                        } else {
+                            tdHari.innerHTML = `<span class="text-muted">-</span>`;
+                        }
+                        tr.appendChild(tdHari);
+                    });
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 4. Ekspor Tabel HTML ke Format Excel (.xls)
+        function exportToExcel() {
+            let tableHtml = document.getElementById("tableJadwal").outerHTML;
+            // Menambahkan header metadata XML agar format tabel terbaca rapi di Microsoft Excel
+            let htmlTemplate = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Jadwal</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                </head>
+                <body>
+                    ${tableHtml}
+                </body>
+                </html>
+            `;
+            let blob = new Blob([htmlTemplate], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `Jadwal_Mengajar_${currentUser.Nama_Lengkap.replace(/\s+/g, '_')}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
