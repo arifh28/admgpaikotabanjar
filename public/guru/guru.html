@@ -349,16 +349,29 @@
             }
 
             dataArray.forEach(guru => {
+                // Cek Status Aktif User
                 const isAktif = (guru.Aktif === 1 || String(guru.Aktif).toLowerCase() === "ya" || String(guru.Aktif).toLowerCase() === "true");
                 
+                // --- TAMBAHAN BARU: Cek Status CBT ---
+                // Asumsi key dari server bernama "CBT" (sesuai header kolom di Spreadsheet)
+                const isCbtAktif = (guru.CBT === 1 || String(guru.CBT) === "1");
+                
                 const badgeStatus = isAktif 
-                    ? `<span class="badge bg-success">Aktif</span>` 
-                    : `<span class="badge bg-danger">Non-Aktif</span>`;
+                    ? `<span class="badge bg-success">User Aktif</span>` 
+                    : `<span class="badge bg-danger">User Non-Aktif</span>`;
                     
-                // --- PERUBAHAN DI SINI (Penambahan Tombol Cetak PDF) ---
+                // Pembuatan Badge CBT
+                const badgeCbt = isCbtAktif 
+                    ? `<span class="badge bg-info mt-1 text-dark"><i class="fa-solid fa-laptop-code"></i> CBT Aktif</span>` 
+                    : `<span class="badge bg-secondary mt-1"><i class="fa-solid fa-laptop-code"></i> CBT Non-Aktif</span>`;
+                    
                 let aksiButtons = "";
                 if (isAktif) {
                     aksiButtons = `
+                        <!-- TOMBOL EMAIL CBT -->
+                        <button class="btn btn-sm btn-outline-warning fw-bold me-1" onclick="kirimEmail('${guru.Username}')" title="Kirim Link Aktivasi CBT">
+                            <i class="fa-solid fa-envelope"></i>
+                        </button>
                         <button class="btn btn-sm btn-outline-primary fw-bold me-1" onclick="cetakPDF('${guru.Nama_Lengkap}', '${guru.Username}', '${guru["Nama Sekolah"]}')" title="Cetak Surat Aktif">
                             <i class="fa-solid fa-file-pdf"></i>
                         </button>
@@ -380,8 +393,14 @@
                     <td>${guru.Username}</td>
                     <td><span class="badge bg-secondary">${guru.Role}</span></td>
                     <td>${guru["Nama Sekolah"]}</td>
-                    <td class="text-center">${badgeStatus}</td>
-                    <td class="text-center pe-4">${aksiButtons}</td> <!-- Render Variabel Baru -->
+                    
+                    <!-- TAMBAHAN BARU: Menampilkan Badge Status & CBT Secara Bersamaan (Atas-Bawah) -->
+                    <td class="text-center">
+                        ${badgeStatus}<br>
+                        ${badgeCbt}
+                    </td>
+                    
+                    <td class="text-center pe-4">${aksiButtons}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -528,6 +547,38 @@
             }).catch(err => {
                 Swal.fire('Error', 'Gagal membuat file PDF.', 'error');
                 console.error(err);
+            });
+        }
+        // Fungsi untuk memicu API Kirim Email
+        function kirimEmail(username) {
+            Swal.fire({
+                title: 'Kirim Email Aktivasi?',
+                text: "Sistem akan mengirimkan link aktivasi CBT ke email guru ini.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Kirim!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Mengirim Email...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    
+                    fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "kirim_email_cbt", nip: username })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success" || data.status === "sukses") {
+                            Swal.fire('Berhasil!', data.message, 'success');
+                        } else {
+                            Swal.fire('Gagal', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error');
+                    });
+                }
             });
         }
     </script>

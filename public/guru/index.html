@@ -266,15 +266,32 @@
                         </a>
                     </div>
 
-                    <!-- Card Keamanan / Ganti Password -->
-                    <div class="col-md-12 mt-4">
-                        <div class="card border-0 shadow-sm border-start border-4 border-warning bg-white">
-                            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                                <div>
-                                    <h5 class="fw-bold mb-1"><i class="fa-solid fa-lock text-warning me-2"></i>Keamanan Akun</h5>
-                                    <p class="mb-0 text-muted small">Ubah kata sandi Anda secara berkala untuk menjaga keamanan akun dan data siswa.</p>
+                    <!-- CARD LEMBAR PENGESAHAN (BARU) -->
+                    <div class="col-md-6">
+                        <a href="#" class="card card-menu h-100 border-0 shadow-sm border-start border-4 border-success text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalLembarPengesahan">
+                            <div class="card-body d-flex flex-column justify-content-center">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon bg-success text-white" style="min-width: 45px;">
+                                        <i class="fa-solid fa-file-signature"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-1 text-dark">Lembar Pengesahan</h5>
+                                        <p class="mb-0 text-muted small">Cetak sampul & validasi dokumen administrasi Anda.</p>
+                                    </div>
                                 </div>
-                                <button class="btn btn-warning fw-bold text-dark px-4" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Card Keamanan / Ganti Password -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-start border-4 border-warning bg-white">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div class="mb-3">
+                                    <h5 class="fw-bold mb-1"><i class="fa-solid fa-lock text-warning me-2"></i>Keamanan Akun</h5>
+                                    <p class="mb-0 text-muted small">Ubah sandi berkala untuk keamanan data.</p>
+                                </div>
+                                <button class="btn btn-warning fw-bold text-dark w-100" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
                                     <i class="fa-solid fa-key me-2"></i>Ganti Password
                                 </button>
                             </div>
@@ -301,6 +318,31 @@
 
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- MODAL LEMBAR PENGESAHAN -->
+    <div class="modal fade" id="modalLembarPengesahan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white border-0">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-file-signature me-2"></i>Cetak Lembar Pengesahan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Silakan masukkan alamat sekolah secara lengkap. Data ini akan disimpan di perangkat Anda untuk pencetakan berikutnya.</p>
+                    <form id="formLembarPengesahan">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Alamat Sekolah</label>
+                            <textarea class="form-control" id="inputAlamatSekolah" rows="3" placeholder="Cth: Jln. Sudiro W No. 52, Kel. Banjar, Kec. Banjar, Kota Banjar." required></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-light w-50 fw-bold border" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-success w-50 fw-bold" id="btnSubmitPengesahan">Cetak Dokumen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -422,7 +464,7 @@
                 document.getElementById('namaSapaan').innerText = userData.Nama_Lengkap;
                 document.getElementById('nipUser').innerText = "NIP: " + (userData.Username || "-");
                 
-                const namaSekolah = userData["Nama Sekolah"];
+                const namaSekolah = userData["Nama Sekolah"] || userData.nama_sekolah;
                 if(namaSekolah) {
                     document.getElementById('namaSekolahTeks').innerHTML = `Tugas di:<br><strong>${namaSekolah}</strong>`;
                 }
@@ -463,21 +505,101 @@
             }
         });
 
+        // --- LOGIKA LEMBAR PENGESAHAN ---
+        document.getElementById('modalLembarPengesahan').addEventListener('show.bs.modal', function () {
+            // Tarik alamat dari localstorage jika sudah pernah disimpan
+            const savedAlamat = localStorage.getItem('alamat_sekolah');
+            if (savedAlamat) {
+                document.getElementById('inputAlamatSekolah').value = savedAlamat;
+            }
+        });
+
+        document.getElementById('formLembarPengesahan').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const inputAlamat = document.getElementById('inputAlamatSekolah').value.trim();
+            if(!inputAlamat) return;
+
+            // Simpan alamat baru ke localStorage agar tersimpan untuk berikutnya
+            localStorage.setItem('alamat_sekolah', inputAlamat);
+
+            const btnSubmit = document.getElementById('btnSubmitPengesahan');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Menyusun...';
+            btnSubmit.disabled = true;
+
+            const sesi = localStorage.getItem('user_session');
+            const userData = JSON.parse(sesi);
+
+            // Payload untuk dikirim ke Netlify function -> Google Apps Script
+            const payload = {
+                action: "generate_lembar_pengesahan",
+                template_id: "1zbdg_0A0S9YOpFKaWFNGiw0CPtZrMNh7_zHpV57v24c",
+                nip: userData.Username,
+                nama: userData.Nama_Lengkap,
+                sekolah: userData["Nama Sekolah"] || userData.nama_sekolah || "",
+                alamat_sekolah: inputAlamat,
+                kepsek: userData.kepala_sekolah || userData["Kepala Sekolah"] || "",
+                nip_kepsek: userData.nip_ks || userData["NIP Kepala Sekolah"] || "",
+                pengawas: userData.nama_pengawas || userData["Pengawas"] || "",
+                nip_pengawas: userData.nip_pengawas || userData["NIP Pengawas"] || "",
+                tahun_ajaran: "2026/2027", 
+                semester: "Ganjil", 
+                prota_cetak: "(-)",
+                prosem_cetak: "(-)",
+                atp_cetak: "(-)",
+                rpm_cetak: "(-)",
+                kaldik_cetak: "(-)",
+                kktp_cetak: "(-)",
+                baso_cetak: "(-)"
+            };
+
+            try {
+                // Menembak fungsi Netlify dokumen.js yang sudah Anda miliki
+                const request = await fetch("/.netlify/functions/dokumen", { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const response = await request.json();
+
+                if (response.status === "sukses") {
+                    alert("Dokumen berhasil disusun. Memulai unduhan...");
+                    
+                    const link = document.createElement('a');
+                    link.href = response.file_url;
+                    link.setAttribute('download', '');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    const modalEl = document.getElementById('modalLembarPengesahan');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    modalInstance.hide();
+                } else {
+                    alert("Gagal menyusun dokumen: " + (response.message || "Error Server."));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan saat menghubungi server pencetakan.");
+            } finally {
+                btnSubmit.innerHTML = 'Cetak Dokumen';
+                btnSubmit.disabled = false;
+            }
+        });
+
         // --- LOGIKA TOGGLE MATA PASSWORD ---
         document.querySelectorAll('.toggle-password').forEach(button => {
             button.addEventListener('click', function() {
-                // Cari input yang menjadi target tombol ini (berdasarkan atribut data-target)
                 const targetId = this.getAttribute('data-target');
                 const inputElement = document.getElementById(targetId);
                 const iconElement = this.querySelector('i');
 
-                // Jika tipe saat ini adalah password, ubah ke text (lihat sandi)
                 if (inputElement.type === "password") {
                     inputElement.type = "text";
                     iconElement.classList.remove('fa-eye-slash');
                     iconElement.classList.add('fa-eye');
                 } else {
-                    // Kembalikan ke mode sembunyi
                     inputElement.type = "password";
                     iconElement.classList.remove('fa-eye');
                     iconElement.classList.add('fa-eye-slash');
@@ -495,7 +617,6 @@
             const errText = document.getElementById('errorPasswordMatch');
             const btnSubmit = document.getElementById('btnSubmitPassword');
 
-            // Validasi kecocokan password
             if (newPass !== confPass) {
                 errText.classList.remove('d-none');
                 return;
@@ -503,7 +624,6 @@
                 errText.classList.add('d-none');
             }
 
-            // Ambil NIP dari sesi lokal
             const sesi = localStorage.getItem('user_session');
             if (!sesi) return;
             const userData = JSON.parse(sesi);
@@ -513,7 +633,6 @@
             btnSubmit.disabled = true;
 
             try {
-                // Tembak ke endpoint Google Apps Script
                 const request = await fetch("/.netlify/functions/auth", { 
                     method: "POST", 
                     headers: { "Content-Type": "application/json" },
@@ -529,7 +648,7 @@
 
                 if (response.status === "sukses" || response.status === "success") {
                     alert("Password berhasil diubah! Silakan login kembali dengan password baru.");
-                    logout(); // Paksa logout agar user login dengan password baru
+                    logout(); 
                 } else {
                     alert("Gagal: " + (response.message || "Password lama salah."));
                 }
@@ -540,17 +659,15 @@
                 btnSubmit.disabled = false;
             }
         });
+
 		function lompatKePortalSiswa() {
 			const sesi = localStorage.getItem('user_session');
 			const targetUrl = 'https://mediapembelajaranpaikotabanjar.vercel.app/';
 
 			if (sesi) {
-				// Encode (samarkan) data JSON menjadi Base64 agar aman di URL
 				const encodedSession = btoa(encodeURIComponent(sesi));
-				// Lempar ke Vercel dengan membawa token sesi
 				window.location.href = `${targetUrl}?token_sesi=${encodedSession}`;
 			} else {
-				// Jika tidak ada sesi, lempar biasa
 				window.location.href = targetUrl;
 			}
 		}
