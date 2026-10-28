@@ -230,6 +230,7 @@
         }
 
         // 4. Merender Matriks (Grid) Daftar Hadir
+        // 4. Merender Matriks (Grid) Daftar Hadir beserta Rekap H, S, I, A
         function renderMatrixAbsen(kelasId) {
             const tbody = document.getElementById('tbodyAbsen');
             const thead = document.getElementById('theadAbsen');
@@ -250,21 +251,35 @@
             // Urutkan tanggal dari yang terlama ke terbaru
             const listTanggal = Array.from(tanggalSet).sort((a, b) => new Date(a) - new Date(b));
 
-            // Buat HTML Header
+            // --- 1. BUAT HTML HEADER ---
             let thHTML = `<tr>
-                <th class="text-center align-middle">No.</th>
-                <th class="align-middle thead-sticky col-sticky">Nama Siswa</th>`;
+                <th class="text-center align-middle" style="background-color: #0dcaf0; color: #000;">No.</th>
+                <th class="align-middle thead-sticky col-sticky" style="background-color: #0dcaf0; color: #000;">Nama Siswa</th>`;
             
+            // Header Tanggal
             listTanggal.forEach(tgl => {
-                thHTML += `<th class="text-center align-middle">${tgl}</th>`;
+                thHTML += `<th class="text-center align-middle" style="background-color: #0dcaf0; color: #000;">${tgl}</th>`;
             });
-            thHTML += `</tr>`;
+            
+            // Header Rekapitulasi (Ditambahkan inline style agar warnanya ikut terekspor ke Excel)
+            thHTML += `
+                <th class="text-center align-middle" style="background-color: #198754; color: white;">H</th>
+                <th class="text-center align-middle" style="background-color: #ffc107; color: black;">S</th>
+                <th class="text-center align-middle" style="background-color: #0dcaf0; color: black;">I</th>
+                <th class="text-center align-middle" style="background-color: #dc3545; color: white;">A</th>
+            </tr>`;
             thead.innerHTML = thHTML;
 
-            // Buat HTML Body (Daftar Siswa & Status Kehadiran)
+            // --- 2. BUAT HTML BODY ---
             tbody.innerHTML = '';
             siswaKelas.forEach((siswa, index) => {
                 let tr = document.createElement('tr');
+                
+                // Variabel Penghitung (Counter) Rekapitulasi
+                let totalH = 0;
+                let totalS = 0;
+                let totalI = 0;
+                let totalA = 0;
                 
                 // Kolom No
                 let tdNo = document.createElement('td');
@@ -289,25 +304,59 @@
                         let statusText = objAbsen.status.toUpperCase();
                         tdStatus.innerText = statusText;
                         
-                        // Pewarnaan Berdasarkan Status
+                        // Pewarnaan Berdasarkan Status dan Penambahan Total
                         if(statusText === "H") {
-                             tdStatus.classList.add('text-success'); // Hadir = Hijau
+                             tdStatus.classList.add('text-success'); 
+                             tdStatus.style.color = '#198754';
+                             totalH++;
                         } else if(statusText === "S") {
-                             tdStatus.classList.add('text-warning'); // Sakit = Kuning
+                             tdStatus.classList.add('text-warning'); 
+                             tdStatus.style.color = '#ffc107';
+                             totalS++;
                         } else if(statusText === "I") {
-                             tdStatus.classList.add('text-info'); // Izin = Biru Muda
+                             tdStatus.classList.add('text-info'); 
+                             tdStatus.style.color = '#0dcaf0';
+                             totalI++;
                         } else if(statusText === "A") {
-                             tdStatus.classList.add('text-danger'); // Alpa = Merah
+                             tdStatus.classList.add('text-danger'); 
+                             tdStatus.style.color = '#dc3545';
+                             totalA++;
                         }
                     } else {
                         tdStatus.innerHTML = '<span class="text-muted opacity-25">-</span>';
                     }
                     tr.appendChild(tdStatus);
                 });
+
+                // --- 3. TAMBAHKAN KOLOM REKAP KE BARIS ---
+                let tdRekapH = document.createElement('td');
+                tdRekapH.className = 'text-center fw-bold';
+                tdRekapH.style.backgroundColor = '#e8f5e9'; // Latar hijau pastel
+                tdRekapH.innerText = totalH;
+                tr.appendChild(tdRekapH);
+
+                let tdRekapS = document.createElement('td');
+                tdRekapS.className = 'text-center fw-bold';
+                tdRekapS.style.backgroundColor = '#fff8e1'; // Latar kuning pastel
+                tdRekapS.innerText = totalS;
+                tr.appendChild(tdRekapS);
+
+                let tdRekapI = document.createElement('td');
+                tdRekapI.className = 'text-center fw-bold';
+                tdRekapI.style.backgroundColor = '#e0f7fa'; // Latar cyan pastel
+                tdRekapI.innerText = totalI;
+                tr.appendChild(tdRekapI);
+
+                let tdRekapA = document.createElement('td');
+                tdRekapA.className = 'text-center fw-bold';
+                tdRekapA.style.backgroundColor = '#ffebee'; // Latar merah pastel
+                tdRekapA.innerText = totalA;
+                tr.appendChild(tdRekapA);
+
                 tbody.appendChild(tr);
             });
         }
-
+        
         // 5. Ekspor Tabel HTML ke Format Excel (.xls)
         function exportToExcel() {
             let select = document.getElementById('selectKelas');
