@@ -45,24 +45,92 @@
                 <i class="fa-solid fa-chalkboard-user fa-3x mb-2 text-warning"></i>
                 <h5 class="fw-bold mb-0" style="font-family: 'Ubuntu', sans-serif;">Panel Guru</h5>
             </div>
-            <div class="sidebar-menu">
+                        <div class="sidebar-menu">
+                <!-- 1. Menu Dashboard (Tunggal) -->
                 <a href="/guru/index.html" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-house"></i> <span>Dashboard Utama</span></div>
                 </a>
 
-                <!-- MENU ARSIP DOKUMEN (BARU, TUNGGAL) -->
-                <a href="/guru/arsip_dokumen.html" class="nav-link-custom active mt-2">
-                    <div class="menu-text"><i class="fa-solid fa-folder-tree"></i> <span>Arsip Dokumen</span></div>
-                </a>
+				<a href="#" onclick="lompatKePortalSiswa()" class="nav-link-custom bg-primary text-white mt-3" style="border-radius: 8px; margin: 0 15px;">
+					<div class="menu-text"><i class="fa-solid fa-external-link-alt"></i> <span>Media Pembelajaran Siswa</span></div>
+				</a>
 
-                <a href="#menuGenerator" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom mt-2">
+                <!-- 2. Menu Master Data (Dropdown) -->
+                <a href="#menuMaster" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-database"></i> <span>Data Master</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuMaster">
+                    <a href="/guru/masterkelas.html" class="nav-link-custom">
+                        <i class="fa-solid fa-chalkboard text-primary"></i> Data Kelas
+                    </a>
+                    <a href="/guru/mastersiswa.html" class="nav-link-custom">
+                        <i class="fa-solid fa-user-graduate text-info"></i> Data Siswa
+                    </a>
+                </div>
+
+                <!-- 3. Menu Pembiasaan (Dropdown) -->
+                <a href="#menuPembiasaan" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-clipboard-list"></i> <span>Pembiasaan</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuPembiasaan">
+                    <a href="/guru/sholatfardlu.html" class="nav-link-custom">
+                        <i class="fa-solid fa-mosque text-primary"></i> Sholat Fardlu
+                    </a>
+                    <a href="/guru/sholatsunat.html" class="nav-link-custom">
+                        <i class="fa-solid fa-hands-praying text-success"></i> Sholat Sunat
+                    </a>
+                    <a href="/guru/infaq.html" class="nav-link-custom">
+                        <i class="fa-solid fa-hand-holding-dollar text-warning"></i> Infaq / Sodaqoh
+                    </a>
+                    <a href="/guru/diniyah.html" class="nav-link-custom">
+                        <i class="fa-solid fa-school text-danger"></i> Diniyah
+                    </a>
+                    <a href="/guru/hafalandoa.html" class="nav-link-custom">
+                        <i class="fa-solid fa-book-open text-info"></i> Hafalan Doa
+                    </a>
+                    <a href="/guru/juzamma.html" class="nav-link-custom">
+                        <i class="fa-solid fa-book-quran text-secondary"></i> Juz 'Amma
+                    </a>
+                </div>
+                <!-- Menu Generator (Aktif) -->
+                <a href="#menuGenerator" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
                     <div class="menu-text"><i class="fa-solid fa-file-word"></i> <span>Administrasi</span></div>
                     <i class="fa-solid fa-chevron-down collapse-icon"></i>
                 </a>
                 <div class="collapse submenu" id="menuGenerator">
+                    <a href="/guru/prota.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> PROTA</a>
+                    <a href="/guru/prosem.html" class="nav-link-custom"><i class="fa-solid fa-calendar-week text-info"></i> PROSEM</a>
+                    <a href="/guru/cp_atp.html" class="nav-link-custom"><i class="fa-solid fa-map-location-dot text-success"></i> CP & ATP</a>
+                    <a href="/guru/kktp.html" class="nav-link-custom"><i class="fa-solid fa-clipboard-check text-primary"></i> KKTP</a>
+                    <a href="/guru/kaldik.html" class="nav-link-custom"><i class="fa-regular fa-calendar-check text-danger"></i> KALDIK</a>
+                    <a href="/guru/rpm.html" class="nav-link-custom"><i class="fa-solid fa-list-check text-secondary"></i> RPM</a>
+                    <a href="/guru/jurnal.html" class="nav-link-custom"><i class="fa-solid fa-book-bookmark text-primary"></i> JURNAL</a>
+                    <a href="/guru/bank_soal.html" class="nav-link-custom"><i class="fa-solid fa-file-lines text-warning"></i> BANK SOAL</a>
+                </div>
+                <!-- Menu Data Guru(Aktif) -->
+                <a href="#menuDataGuru" data-bs-toggle="collapse" aria-expanded="false" class="nav-link-custom">
+                    <div class="menu-text"><i class="fa-solid fa-file-word"></i> <span>Data Guru</span></div>
+                    <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                </a>
+                <div class="collapse submenu" id="menuDataGuru">
                     <a href="/guru/jadwal.html" class="nav-link-custom"><i class="fa-solid fa-calendar-days text-warning"></i> JADWAL PELAJARAN</a>
                     <a href="/guru/daftar_hadir.html" class="nav-link-custom"><i class="fa-solid fa-user-check text-info"></i> DAFTAR HADIR</a>
+                    <a href="/guru/daftar_nilai.html" class="nav-link-custom"><i class="fa-solid fa-star text-success"></i> DAFTAR NILAI</a>
+                    <a href="/guru/analisis_hasil_ulangan.html" class="nav-link-custom"><i class="fa-solid fa-chart-pie text-primary"></i> ANALISIS HASIL ULANGAN</a>
+                    <a href="/guru/remidial.html" class="nav-link-custom"><i class="fa-solid fa-arrow-up-right-dots text-danger"></i> REMIDIAL & PENGAYAAN</a>
+                    <a href="/guru/bimbingan_konseling.html" class="nav-link-custom"><i class="fa-solid fa-handshake-angle text-secondary"></i> BIMBINGAN KONSELING</a>
+                    <a href="/guru/inventaris.html" class="nav-link-custom"><i class="fa-solid fa-boxes-stacked text-primary"></i> INVENTARIS KELAS</a>
+                    <a href="/guru/notula_rapat.html" class="nav-link-custom"><i class="fa-solid fa-users-rectangle text-warning"></i> NOTULA RAPAT</a>
                 </div>
+                <!-- 4. Menu Admin (Disembunyikan secara default, diaktifkan via JS) -->
+                <a href="/guru/admin.html" class="nav-link-custom d-none" id="sidebarMenuAdmin">
+                    <div class="menu-text"><i class="fa-solid fa-user-shield text-light"></i> <span>Halaman Admin</span></div>
+                </a>
+                <a href="/guru/arsip_dokumen.html" class="nav-link-custom active">
+                    <div class="menu-text"><i class="fa-solid fa-folder-tree"></i> <span>Arsip Dokumen</span></div>
+                </a>
             </div>
             <div class="p-3 text-center">
                 <p class="small opacity-50 mb-0" id="namaSekolahTeks">Memuat sekolah...</p>
